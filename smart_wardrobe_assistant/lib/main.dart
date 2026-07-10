@@ -3,8 +3,17 @@ import 'screens/splash/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
+import 'screens/auth/forgot_password_screen.dart';
+import 'screens/home/home_dashboard_screen.dart';
+import 'database/database_helper.dart';
 
-void main() {
+void main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize the database
+  await DatabaseHelper.instance.initDatabase();
+  
   runApp(const MyApp());
 }
 
@@ -26,8 +35,15 @@ class MyApp extends StatelessWidget {
         '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
-        '/home': (context) => const MyHomePage(title: 'Smart Wardrobe Assistant'),
-        '/forgot-password': (context) => const MyHomePage(title: 'Forgot Password Screen'),
+        '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/home': (context) => const HomeDashboardScreen(),
+        '/otp-verification': (context) => const MyHomePage(title: 'OTP Verification Screen'),
+        '/add-clothing': (context) => const MyHomePage(title: 'Add Clothing Screen'),
+        '/wardrobe': (context) => const MyHomePage(title: 'Wardrobe Screen'),
+        '/suggestions': (context) => const MyHomePage(title: 'Suggestions Screen'),
+        '/history': (context) => const MyHomePage(title: 'History Screen'),
+        '/profile': (context) => const MyHomePage(title: 'Profile Screen'),
+        '/search': (context) => const MyHomePage(title: 'Search Screen'),
       },
     );
   }

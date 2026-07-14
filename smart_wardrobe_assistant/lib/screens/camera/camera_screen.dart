@@ -47,3 +47,45 @@ setState(() {
 _isCameraInitialized = true;
 });
 }
+Future<void> _captureImage() async {
+if (_controller == null ||
+!_controller!.value.isInitialized ||
+_isCapturing) {
+return;
+}
+
+setState(() {
+_isCapturing = true;
+});
+
+try {
+final XFile image = await _controller!.takePicture();
+
+if (!mounted) return;
+
+Navigator.push(
+context,
+MaterialPageRoute(
+builder: (_) => ImagePreviewScreen(
+imageFile: File(image.path),
+),
+),
+);
+} catch (e) {
+ScaffoldMessenger.of(context).showSnackBar(
+SnackBar(
+content: Text('Failed to capture image: $e'),
+),
+);
+}
+
+setState(() {
+_isCapturing = false;
+});
+}
+
+@override
+void dispose() {
+_controller?.dispose();
+super.dispose();
+}

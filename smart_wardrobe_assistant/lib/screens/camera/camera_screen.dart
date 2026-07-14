@@ -67,7 +67,7 @@ Navigator.push(
 context,
 MaterialPageRoute(
 builder: (_) => ImagePreviewScreen(
-imageFile: File(image.path),
+  imagePath: image.path,
 ),
 ),
 );

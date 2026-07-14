@@ -28,3 +28,22 @@ void initState() {
 super.initState();
 _initializeCamera();
 }
+Future<void> _initializeCamera() async {
+if (widget.cameras.isEmpty) {
+return;
+}
+
+_controller = CameraController(
+widget.cameras[0],
+ResolutionPreset.high,
+enableAudio: false,
+);
+
+await _controller!.initialize();
+
+if (!mounted) return;
+
+setState(() {
+_isCameraInitialized = true;
+});
+}

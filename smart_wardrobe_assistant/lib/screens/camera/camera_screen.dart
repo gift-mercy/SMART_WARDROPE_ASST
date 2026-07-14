@@ -89,3 +89,51 @@ void dispose() {
 _controller?.dispose();
 super.dispose();
 }
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: const Color(0xFFF8FAFC),
+
+    appBar: AppBar(
+      title: const Text("Camera"),
+      backgroundColor: const Color(0xFF4F46E5),
+    ),
+
+    body: _isCameraInitialized
+        ? CameraPreview(_controller!)
+        : const Center(
+      child: CircularProgressIndicator(),
+    ),
+
+    floatingActionButton: Padding(
+      padding: const EdgeInsets.only(left: 30),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+
+          FloatingActionButton(
+            heroTag: "gallery",
+            backgroundColor: const Color(0xFF14B8A6),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const GalleryScreen(),
+                ),
+              );
+            },
+            child: const Icon(Icons.photo),
+          ),
+
+          FloatingActionButton(
+            heroTag: "camera",
+            backgroundColor: const Color(0xFF4F46E5),
+            onPressed: _captureImage,
+            child: const Icon(Icons.camera_alt),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+}

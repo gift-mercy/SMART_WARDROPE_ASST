@@ -4,9 +4,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import 'gallery_screen.dart';
-import
+import 'image_preview_screen.dart';
 
-'image_preview_screen.dart';
 class CameraScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
 
@@ -17,4 +16,15 @@ class CameraScreen extends StatefulWidget {
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
+}
+
+class _CameraScreenState extends State<CameraScreen> {
+CameraController? _controller;
+bool _isCameraInitialized = false;
+bool _isCapturing = false;
+
+@override
+void initState() {
+super.initState();
+_initializeCamera();
 }

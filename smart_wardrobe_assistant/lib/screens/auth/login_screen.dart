@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -44,9 +46,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual login API call POST /login
-      // For now, navigate to home
-      Navigator.of(context).pushReplacementNamed('/home');
+      // Use AuthProvider to login
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      authProvider.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      ).then((success) {
+        if (success) {
+          // Navigate to home on successful login
+          Navigator.of(context).pushReplacementNamed('/home');
+        } else {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? 'Login failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
     }
   }
 

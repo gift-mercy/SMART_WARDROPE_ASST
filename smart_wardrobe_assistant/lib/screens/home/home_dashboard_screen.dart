@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+
+import 'package:flutter_application_1/screens/camera/camera_screen.dart';
+import 'package:camera/camera.dart';
+
 import 'package:provider/provider.dart';
 import '../../providers/weather_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../services/greeting_service.dart';
 import '../../widgets/profile_avatar.dart';
+
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -58,6 +63,22 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         break;
     }
   }
+  Future<void> _navigateToCamera() async {
+    // 1. Fetch available cameras on the device dynamically
+    WidgetsFlutterBinding.ensureInitialized();
+    final List<CameraDescription> availableDeviceCameras = await availableCameras();
+
+    // 2. Safely jump to your camera screen, passing the device cameras along
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CameraScreen(cameras: availableDeviceCameras),
+        ),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -430,7 +451,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         _buildQuickActionButton(
           icon: Icons.add_a_photo,
           label: 'Add clothes',
-          onTap: () => Navigator.of(context).pushNamed('/add-clothing'),
+          onTap: _navigateToCamera,
         ),
         _buildQuickActionButton(
           icon: Icons.checkroom,
@@ -533,9 +554,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/add-clothing');
-                  },
+                  onPressed: _navigateToCamera,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2563EB),
                     shape: RoundedRectangleBorder(

@@ -1,55 +1,105 @@
-// ============================================
-// LOADING_WIDGET.DART
-// ============================================
-// Reusable loading indicator widget
-//
-// Purpose:
-// - Display loading state
-// - Consistent loading animation
-// - Optional message
-// ============================================
-
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../core/constants/app_colors.dart';
+import '../core/constants/app_text_styles.dart';
 
-/// LoadingWidget
-/// Displays a loading indicator with optional message
+/// Full-screen or inline loading indicator.
 class LoadingWidget extends StatelessWidget {
-  /// Optional loading message
   final String? message;
+  final bool fullScreen;
+  final Color? color;
 
   const LoadingWidget({
     super.key,
+    this.message,
+    this.fullScreen = true,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final indicator = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(
+            color ?? AppColors.primary,
+          ),
+          strokeWidth: 3,
+        ),
+        if (message != null) ...[
+          const SizedBox(height: 16),
+          Text(
+            message!,
+            style: AppTextStyles.small,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ],
+    );
+
+    if (!fullScreen) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: indicator,
+        ),
+      );
+    }
+
+    return Container(
+      color: AppColors.background,
+      child: Center(
+        child: indicator,
+      ),
+    );
+  }
+}
+
+/// Transparent overlay spinner — useful over camera preview or images.
+class LoadingOverlay extends StatelessWidget {
+  final bool isLoading;
+  final Widget child;
+  final String? message;
+
+  const LoadingOverlay({
+    super.key,
+    required this.isLoading,
+    required this.child,
     this.message,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Loading Indicator
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
-            strokeWidth: 3,
-          ),
-
-          if (message != null) ...[
-            const SizedBox(height: 24),
-
-            // Loading Message
-            Text(
-              message!,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: const Color(0xFF64748B),
+    return Stack(
+      children: [
+        child,
+        if (isLoading)
+          Container(
+            color: AppColors.overlay,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.cameraControl,
+                    ),
+                    strokeWidth: 3,
+                  ),
+                  if (message != null) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      message!,
+                      style: AppTextStyles.small.copyWith(
+                        color: AppColors.cameraControl,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              textAlign: TextAlign.center,
             ),
-          ],
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

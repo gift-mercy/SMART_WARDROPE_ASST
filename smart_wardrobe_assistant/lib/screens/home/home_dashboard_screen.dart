@@ -6,7 +6,9 @@ import 'package:camera/camera.dart';
 import 'package:provider/provider.dart';
 import '../../providers/weather_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/profile_provider.dart';
 import '../../services/greeting_service.dart';
+import '../../widgets/profile_avatar.dart';
 
 
 class HomeDashboardScreen extends StatefulWidget {
@@ -28,6 +30,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     // Initialize weather when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<WeatherProvider>().initializeWeather();
+      
+      // Initialize profile provider with current user ID
+      final authProvider = context.read<AuthProvider>();
+      if (authProvider.isAuthenticated && authProvider.currentUser != null) {
+        context.read<ProfileProvider>().setUserId(authProvider.currentUser!.userId);
+      }
     });
   }
   
@@ -133,7 +141,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         final greeting = GreetingService.getGreetingWithName(
           authProvider.currentUser?.firstName,
         );
-        final userName = authProvider.currentUser?.fullName ?? 'Guest';
         final userInitials = authProvider.currentUser?.initials ?? 'G';
 
         return Row(
@@ -164,42 +171,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ],
               ),
             ),
-            // Profile Photo
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).pushNamed('/profile');
-              },
-              child: CircleAvatar(
-                radius: 28,
-                backgroundColor: const Color(0xFF2563EB),
-                child: authProvider.currentUser?.profilePicture != null
-                    ? ClipOval(
-                        child: Image.network(
-                          authProvider.currentUser!.profilePicture!,
-                          width: 56,
-                          height: 56,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Text(
-                              userInitials,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    : Text(
-                        userInitials,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-              ),
+            // Profile Photo with ProfileAvatar widget
+            ProfileAvatar(
+              radius: 28,
+              initials: userInitials,
+              showCameraIcon: true,
             ),
           ],
         );

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
+
+import 'core/themes/app_theme.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -6,44 +9,94 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/home/home_dashboard_screen.dart';
 import 'database/database_helper.dart';
+import 'screens/camera/camera_screen.dart';
+
 
 void main() async {
-  // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize the database
+
+  // Initialize database
   await DatabaseHelper.instance.initDatabase();
-  
-  runApp(const MyApp());
+
+  // Get available cameras
+  final cameras = await availableCameras();
+
+
+  runApp(MyApp(cameras: cameras));
 }
 
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+
+  final List<CameraDescription> cameras;
+
+  const MyApp({
+    super.key,
+    required this.cameras,
+  });
+
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Smart Wardrobe Assistant',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2563EB)),
-        useMaterial3: true,
-      ),
+
+      theme: AppTheme.light,
+
+
       initialRoute: '/',
+
       routes: {
+
         '/': (context) => const SplashScreen(),
+
         '/onboarding': (context) => const OnboardingScreen(),
+
         '/login': (context) => const LoginScreen(),
+
         '/register': (context) => const RegisterScreen(),
-        '/forgot-password': (context) => const ForgotPasswordScreen(),
-        '/home': (context) => const HomeDashboardScreen(),
-        '/otp-verification': (context) => const MyHomePage(title: 'OTP Verification Screen'),
-        '/add-clothing': (context) => const MyHomePage(title: 'Add Clothing Screen'),
-        '/wardrobe': (context) => const MyHomePage(title: 'Wardrobe Screen'),
-        '/suggestions': (context) => const MyHomePage(title: 'Suggestions Screen'),
-        '/history': (context) => const MyHomePage(title: 'History Screen'),
-        '/profile': (context) => const MyHomePage(title: 'Profile Screen'),
-        '/search': (context) => const MyHomePage(title: 'Search Screen'),
+
+        '/forgot-password':
+            (context) => const ForgotPasswordScreen(),
+
+        '/home':
+            (context) => const HomeDashboardScreen(),
+
+
+        // Camera route added by you
+        '/camera':
+            (context) => CameraScreen(cameras: cameras),
+
+
+        '/otp-verification':
+            (context) =>
+        const MyHomePage(title: 'OTP Verification Screen'),
+
+        '/add-clothing':
+            (context) =>
+        const MyHomePage(title: 'Add Clothing Screen'),
+
+        '/wardrobe':
+            (context) =>
+        const MyHomePage(title: 'Wardrobe Screen'),
+
+        '/suggestions':
+            (context) =>
+        const MyHomePage(title: 'Suggestions Screen'),
+
+        '/history':
+            (context) =>
+        const MyHomePage(title: 'History Screen'),
+
+        '/profile':
+            (context) =>
+        const MyHomePage(title: 'Profile Screen'),
+
+        '/search':
+            (context) =>
+        const MyHomePage(title: 'Search Screen'),
       },
     );
   }

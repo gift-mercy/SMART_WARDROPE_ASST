@@ -64,6 +64,12 @@ dependencies:
   
   # Google Fonts for typography
   google_fonts: ^6.1.0
+  
+  # Image picker for profile pictures
+  image_picker: ^1.0.7
+  
+  # Permission handler for camera and gallery access
+  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:

@@ -173,8 +173,9 @@ fixnum:
     sha256: b6dc7065e46c974bc7c5f143080a6764ec7a4be6da1285ececdc37be96de53be
     url: "https://pub.dev"
   source: hosted
-  version: "1.1.1"  flutter:
-    dependency: "direct main"
+  version: "1.1.1"
+
+flutter:    dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -355,8 +356,9 @@ image_picker_windows:
     sha256: d248c86554a72b5495a31c56f060cf73a41c7ff541689327b1a7dbccc33adfae
     url: "https://pub.dev"
   source: hosted
-  version: "0.2.2"  leak_tracker:
-    dependency: transitive
+  version: "0.2.2"
+
+leak_tracker:   dependency: transitive
     description:
       name: leak_tracker
       sha256: "33e2e26bdd85a0112ec15400c8cbffea70d0f9c3407491f672a2fad47915e2de"
@@ -418,8 +420,14 @@ image_picker_windows:
       sha256: "41a20518f0cb1256669420fdba0cd90d21561e560ac240f26ef8322e45bb7ed6"
       url: "https://pub.dev"
     source: hosted
+  mime:
+    dependency: transitive
+    description:
+      name: mime
+      sha256: "41a20518f0cb1256669420fdba0cd90d21561e560ac240f26ef8322e45bb7ed6"
+      url: "https://pub.dev"
+    source: hosted
     version: "2.0.0"
-
   nested:
     dependency: transitive
     description:
@@ -487,10 +495,18 @@ image_picker_windows:
     dependency: "direct main"
     description:
       name: permission_handler
+  permission_handler:
+    dependency: "direct main"
+    description:
+      name: permission_handler
       sha256: fe54465bcc62a4564c6e4db337bbaded6c0c0fa6e10487414436d163114784f6
       url: "https://pub.dev"
     source: hosted
     version: "12.0.3"
+  permission_handler_android:
+    dependency: transitive
+    description:
+      name: permission_handler_android
   permission_handler_android:
     dependency: transitive
     description:

@@ -6,9 +6,11 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/home/home_dashboard_screen.dart';
+import 'screens/wardrobe/wardrobe_screen.dart';
 import 'database/database_helper.dart';
 import 'providers/weather_provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/wardrobe_provider.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()..initialize()),
+        ChangeNotifierProvider(create: (_) => WardrobeProvider()),
       ],
       child: MaterialApp(
         title: 'Smart Wardrobe Assistant',
@@ -47,7 +50,8 @@ class MyApp extends StatelessWidget {
           '/home': (context) => const HomeDashboardScreen(),
           '/otp-verification': (context) => const MyHomePage(title: 'OTP Verification Screen'),
           '/add-clothing': (context) => const MyHomePage(title: 'Add Clothing Screen'),
-          '/wardrobe': (context) => const MyHomePage(title: 'Wardrobe Screen'),
+          '/wardrobe': (context) => const WardrobeScreen(),
+          '/clothing-details': (context) => const MyHomePage(title: 'Clothing Details Screen'),
           '/suggestions': (context) => const MyHomePage(title: 'Suggestions Screen'),
           '/history': (context) => const MyHomePage(title: 'History Screen'),
           '/profile': (context) => const MyHomePage(title: 'Profile Screen'),

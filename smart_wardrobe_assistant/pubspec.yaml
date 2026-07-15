@@ -55,6 +55,9 @@ dependencies:
   
   # Persistent storage for user sessions
   shared_preferences: ^2.2.2
+  
+  # Google Fonts for typography
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:

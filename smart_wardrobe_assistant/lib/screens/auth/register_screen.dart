@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -77,9 +79,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual registration API call POST /register
-      // For now, navigate to home
-      Navigator.of(context).pushReplacementNamed('/home');
+      // Use AuthProvider to register
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      authProvider.register(
+        fullName: _fullNameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        gender: null, // Can add gender field to form if needed
+      ).then((success) {
+        if (success) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Account created successfully! Please login.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          
+          // Navigate to login screen after successful registration
+          Navigator.of(context).pushReplacementNamed('/login');
+        } else {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? 'Registration failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
     }
   }
 

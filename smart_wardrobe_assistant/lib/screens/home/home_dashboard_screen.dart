@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_application_1/screens/camera/camera_screen.dart';
 import 'package:camera/camera.dart';
+
+import 'package:provider/provider.dart';
+import '../../providers/weather_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/greeting_service.dart';
+
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -13,12 +20,16 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   int _selectedIndex = 0;
   
   // Mock data - Replace with actual data from database/API
-  final String userName = 'Rodney';
   final bool isNewUser = true; // Set to false for existing user state
-  final String temperature = '26°C';
-  final String weatherCondition = 'Sunny';
-  final String weatherDescription = 'Perfect weather for light clothing.';
-  final String weatherIcon = '☀️';
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize weather when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<WeatherProvider>().initializeWeather();
+    });
+  }
   
   void _onBottomNavTap(int index) {
     setState(() {
@@ -116,52 +127,83 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   /// HEADER SECTION
   /// ============================================
   Widget _buildHeader() {
-    // Get time-based greeting
-    final hour = DateTime.now().hour;
-    String greeting;
-    if (hour < 12) {
-      greeting = 'Good Morning 👋';
-    } else if (hour < 17) {
-      greeting = 'Good Afternoon 👋';
-    } else {
-      greeting = 'Good Evening 👋';
-    }
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        // Get dynamic greeting
+        final greeting = GreetingService.getGreetingWithName(
+          authProvider.currentUser?.firstName,
+        );
+        final userName = authProvider.currentUser?.fullName ?? 'Guest';
+        final userInitials = authProvider.currentUser?.initials ?? 'G';
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              greeting,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF6B7280),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    greeting,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF6B7280),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  if (authProvider.isAuthenticated)
+                    Text(
+                      authProvider.currentUser!.firstName,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111827),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              userName,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF111827),
+            // Profile Photo
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushNamed('/profile');
+              },
+              child: CircleAvatar(
+                radius: 28,
+                backgroundColor: const Color(0xFF2563EB),
+                child: authProvider.currentUser?.profilePicture != null
+                    ? ClipOval(
+                        child: Image.network(
+                          authProvider.currentUser!.profilePicture!,
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Text(
+                              userInitials,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Text(
+                        userInitials,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
             ),
           ],
-        ),
-        // Profile Photo
-        CircleAvatar(
-          radius: 28,
-          backgroundColor: const Color(0xFFE5E7EB),
-          child: const Icon(
-            Icons.person,
-            size: 32,
-            color: Color(0xFF6B7280),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -204,57 +246,222 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   /// WEATHER CARD
   /// ============================================
   Widget _buildWeatherCard() {
-    return Card(
-      elevation: 0,
-      color: const Color(0xFFFEF3C7),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          children: [
-            // Weather Icon
-            Text(
-              weatherIcon,
-              style: const TextStyle(fontSize: 48),
+    return Consumer<WeatherProvider>(
+      builder: (context, weatherProvider, child) {
+        // Loading state
+        if (weatherProvider.isLoading && !weatherProvider.hasData) {
+          return Card(
+            elevation: 0,
+            color: const Color(0xFFFEF3C7),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(width: 16),
-            // Weather Info
-            Expanded(
+            child: const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
+                ),
+              ),
+            ),
+          );
+        }
+
+        // Error state (with cached data fallback)
+        if (weatherProvider.hasError && !weatherProvider.hasData) {
+          return Card(
+            elevation: 0,
+            color: const Color(0xFFFEF3C7),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    temperature,
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF111827),
-                    ),
+                  const Icon(
+                    Icons.cloud_off,
+                    size: 48,
+                    color: Color(0xFF6B7280),
                   ),
+                  const SizedBox(height: 12),
                   Text(
-                    weatherCondition,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF374151),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    weatherDescription,
+                    weatherProvider.errorMessage ?? 'Unable to fetch weather',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFF6B7280),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed: () {
+                      weatherProvider.refreshWeather();
+                    },
+                    icon: const Icon(Icons.refresh, size: 20),
+                    label: const Text('Retry'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF2563EB),
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+
+        // Location denied state
+        if (weatherProvider.isLocationDenied) {
+          return Card(
+            elevation: 0,
+            color: const Color(0xFFFEF3C7),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.location_off,
+                    size: 48,
+                    color: Color(0xFF6B7280),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Location access required',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF374151),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    weatherProvider.errorMessage ?? 'Please grant location permission to see weather',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF6B7280),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await weatherProvider.requestLocationPermission();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Grant Permission',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Success state with weather data
+        final weather = weatherProvider.weather;
+        if (weather != null) {
+          return Card(
+            elevation: 0,
+            color: const Color(0xFFFEF3C7),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: [
+                  // Weather Icon
+                  Text(
+                    weather.weatherEmoji,
+                    style: const TextStyle(fontSize: 48),
+                  ),
+                  const SizedBox(width: 16),
+                  // Weather Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              weather.temperatureDisplay,
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF111827),
+                              ),
+                            ),
+                            const Spacer(),
+                            if (weatherProvider.isLoading)
+                              const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFF2563EB),
+                                  ),
+                                ),
+                              )
+                            else
+                              IconButton(
+                                icon: const Icon(Icons.refresh, size: 20),
+                                onPressed: () {
+                                  weatherProvider.refreshWeather();
+                                },
+                                color: const Color(0xFF6B7280),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                          ],
+                        ),
+                        Text(
+                          weather.condition,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF374151),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          weather.friendlyDescription,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          weather.cityName,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF9CA3AF),
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Default fallback
+        return const SizedBox.shrink();
+      },
     );
   }
 

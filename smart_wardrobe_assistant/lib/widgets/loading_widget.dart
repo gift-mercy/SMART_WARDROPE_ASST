@@ -3,14 +3,6 @@ import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
 
 /// Full-screen or inline loading indicator.
-///
-/// ```dart
-/// // Full-screen overlay
-/// LoadingWidget()
-///
-/// // Inline with custom message
-/// LoadingWidget(message: 'Processing image…', fullScreen: false)
-/// ```
 class LoadingWidget extends StatelessWidget {
   final String? message;
   final bool fullScreen;
@@ -46,12 +38,19 @@ class LoadingWidget extends StatelessWidget {
     );
 
     if (!fullScreen) {
-      return Center(child: Padding(padding: const EdgeInsets.all(24), child: indicator));
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: indicator,
+        ),
+      );
     }
 
     return Container(
       color: AppColors.background,
-      child: Center(child: indicator),
+      child: Center(
+        child: indicator,
+      ),
     );
   }
 }
@@ -82,7 +81,9 @@ class LoadingOverlay extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.cameraControl),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.cameraControl,
+                    ),
                     strokeWidth: 3,
                   ),
                   if (message != null) ...[

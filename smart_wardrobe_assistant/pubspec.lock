@@ -418,10 +418,8 @@ image_picker_windows:
       sha256: "41a20518f0cb1256669420fdba0cd90d21561e560ac240f26ef8322e45bb7ed6"
       url: "https://pub.dev"
     source: hosted
-
     version: "2.0.0"
 
-    version: "1.16.0"
   nested:
     dependency: transitive
     description:
@@ -429,8 +427,7 @@ image_picker_windows:
       sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
-  path:
+    version: "1.0.0"  path:
     dependency: "direct main"
     description:
       name: path
@@ -722,10 +719,14 @@ image_picker_windows:
       sha256: "949a932224383300f01be9221c39180316445ecb8e7547f70a41a35bf421fb9e"
       url: "https://pub.dev"
     source: hosted
-
+  test_api:
+    dependency: transitive
+    description:
+      name: test_api
+      sha256: "949a932224383300f01be9221c39180316445ecb8e7547f70a41a35bf421fb9e"
+      url: "https://pub.dev"
+    source: hosted
     version: "0.7.11"
-
-    version: "0.7.6"
 
   typed_data:
     dependency: transitive
@@ -735,6 +736,7 @@ image_picker_windows:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+
   uuid:
     dependency: transitive
     description:
@@ -742,9 +744,7 @@ image_picker_windows:
       sha256: "9b129329f58692f6e6578329498a8fe9fbe98f090beb764ffbb8ee2eadd01dcd"
       url: "https://pub.dev"
     source: hosted
-    version: "4.6.0"
-
-  vector_math:
+    version: "4.6.0"  vector_math:
     dependency: transitive
     description:
       name: vector_math
@@ -777,5 +777,7 @@ image_picker_windows:
     source: hosted
     version: "1.1.0"
 sdks:
+
   dart: ">=3.12.0 <4.0.0"
   flutter: ">=3.44.0"
+

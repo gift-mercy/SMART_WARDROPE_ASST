@@ -72,10 +72,10 @@ class WeatherService {
       );
     }
 
-    // Get current position
+    // Get current position with longer timeout for emulators
     return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.medium,
-      timeLimit: const Duration(seconds: 10),
+      desiredAccuracy: LocationAccuracy.low, // Changed to low for better performance
+      timeLimit: const Duration(seconds: 30), // Increased timeout
     );
   }
 
@@ -96,11 +96,11 @@ class WeatherService {
 
       print('Fetching weather from: $url');
 
-      // Make HTTP GET request
+      // Make HTTP GET request with longer timeout
       final response = await http.get(url).timeout(
-        const Duration(seconds: 10),
+        const Duration(seconds: 30),
         onTimeout: () {
-          throw Exception('Weather API request timed out. Please try again.');
+          throw Exception('Weather API request timed out. Please check your internet connection.');
         },
       );
 
@@ -161,11 +161,11 @@ class WeatherService {
 
       print('Fetching weather for city: $cityName');
 
-      // Make HTTP GET request
+      // Make HTTP GET request with longer timeout
       final response = await http.get(url).timeout(
-        const Duration(seconds: 10),
+        const Duration(seconds: 30),
         onTimeout: () {
-          throw Exception('Weather API request timed out. Please try again.');
+          throw Exception('Weather API request timed out. Please check your internet connection.');
         },
       );
 

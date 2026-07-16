@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import '../../services/app_initialization_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,10 +13,38 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Navigate to onboarding after 3 seconds
-    Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/onboarding');
-    });
+    // Initialize app and determine navigation route
+    _initializeApp();
+  }
+
+  /// Initialize the app and navigate to the appropriate screen
+  /// This method:
+  /// 1. Waits for 3 seconds (splash screen display time)
+  /// 2. Checks if user is logged in
+  /// 3. Checks if user has completed onboarding
+  /// 4. Navigates to the correct screen based on these conditions
+  Future<void> _initializeApp() async {
+    // Show splash screen for 3 seconds
+    await Future.delayed(const Duration(seconds: 3));
+
+    // Determine which screen to navigate to
+    final appInitService = AppInitializationService.instance;
+    
+    // Get initialization status (for debugging)
+    final status = await appInitService.getInitializationStatus();
+    print('App Initialization Status:');
+    print('  - Is Logged In: ${status['isLoggedIn']}');
+    print('  - Has Completed Onboarding: ${status['hasCompletedOnboarding']}');
+    print('  - Initial Route: ${status['initialRoute']}');
+    print('  - Route Name: ${status['routeName']}');
+
+    // Get the route name to navigate to
+    final routeName = await appInitService.getInitialRouteName();
+
+    // Navigate to the determined route
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed(routeName);
+    }
   }
 
   @override

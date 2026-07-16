@@ -12,7 +12,10 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/home/home_dashboard_screen.dart';
 import 'screens/wardrobe/wardrobe_screen.dart';
+import 'screens/wardrobe/clothing_details_screen.dart';
 import 'screens/camera/camera_screen.dart';
+
+import 'models/clothing_item.dart';
 
 import 'database/database_helper.dart';
 
@@ -55,6 +58,20 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         initialRoute: '/',
+        onGenerateRoute: (settings) {
+          // Handle routes with arguments
+          if (settings.name == '/clothing-details') {
+            final clothingItem = settings.arguments as ClothingItem;
+            return MaterialPageRoute(
+              builder: (context) => ClothingDetailsScreen(
+                clothingItem: clothingItem,
+              ),
+            );
+          }
+
+          // Return null for routes handled by the routes map
+          return null;
+        },
         routes: {
           '/': (context) => const SplashScreen(),
 
@@ -81,8 +98,8 @@ class MyApp extends StatelessWidget {
           '/add-clothing': (context) =>
               const MyHomePage(title: 'Add Clothing Screen'),
 
-          '/clothing-details': (context) =>
-              const MyHomePage(title: 'Clothing Details Screen'),
+          '/edit-clothing': (context) =>
+              const MyHomePage(title: 'Edit Clothing Screen'),
 
           '/suggestions': (context) =>
               const MyHomePage(title: 'Suggestions Screen'),

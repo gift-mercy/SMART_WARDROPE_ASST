@@ -4,7 +4,7 @@
     <!-- Camera permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!-- Storage permissions -->
+    <!-- Storage permissions for Android 12 and below -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -14,6 +14,7 @@
         android:maxSdkVersion="29"
         tools:replace="android:maxSdkVersion" />
 
+    <!-- Android 13+ image access -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <!-- Weather location permissions -->
@@ -22,20 +23,6 @@
 
     <!-- Internet permission -->
     <uses-permission android:name="android.permission.INTERNET" />
-<!-- Camera permission for taking profile pictures -->
-<uses-permission android:name="android.permission.CAMERA" />
-
-<!-- Storage permissions for Android 12 and below -->
-<uses-permission
-    android:name="android.permission.READ_EXTERNAL_STORAGE"
-    android:maxSdkVersion="32" />
-
-<uses-permission
-    android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-    android:maxSdkVersion="32" />
-
-<!-- Android 13+ image access -->
-<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <application
         android:label="flutter_application_1"
         android:name="${applicationName}"

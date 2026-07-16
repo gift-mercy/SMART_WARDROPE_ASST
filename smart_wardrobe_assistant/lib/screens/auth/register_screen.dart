@@ -87,19 +87,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
         gender: null, // Can add gender field to form if needed
-      ).then((success) {
+      ).then((success) async {
         if (success) {
-          // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Account created successfully! Please login.'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
+          // Auto-login after registration
+          final loginSuccess = await authProvider.login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
           );
           
-          // Navigate to login screen after successful registration
-          Navigator.of(context).pushReplacementNamed('/login');
+          if (loginSuccess) {
+            // Show success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Account created successfully! Welcome!'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
+              ),
+            );
+            
+            // Navigate to home dashboard after successful registration (as per PDF spec)
+            Navigator.of(context).pushReplacementNamed('/home');
+          } else {
+            // Login failed, redirect to login screen
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Account created! Please login.'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
+              ),
+            );
+            Navigator.of(context).pushReplacementNamed('/login');
+          }
         } else {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
@@ -116,14 +134,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8FAFC), // Background color from PDF
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
                 
@@ -145,7 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF111827),
+                      color: Color(0xFF1E293B), // Primary Text color from PDF
                     ),
                   ),
                 ),
@@ -158,7 +176,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF111827),
+                    color: Color(0xFF1E293B), // Primary Text color from PDF
                   ),
                 ),
                 
@@ -169,7 +187,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'Create your account to start',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B), // Secondary Text color from PDF
                   ),
                 ),
                 
@@ -179,7 +197,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'building your digital wardrobe.',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B), // Secondary Text color from PDF
                   ),
                 ),
                 
@@ -197,18 +215,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       fontSize: 16,
                     ),
                     filled: true,
-                    fillColor: const Color(0xFFF9FAFB),
+                    fillColor: const Color(0xFFFFFFFF), // Cards color from PDF
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(12), // Rounded corners from PDF
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                      borderSide: const BorderSide(color: Color(0xFF4F46E5)), // Primary Color from PDF
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -235,18 +253,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       fontSize: 16,
                     ),
                     filled: true,
-                    fillColor: const Color(0xFFF9FAFB),
+                    fillColor: const Color(0xFFFFFFFF), // Cards color from PDF
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(12), // Rounded corners from PDF
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                      borderSide: const BorderSide(color: Color(0xFF4F46E5)), // Primary Color from PDF
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -275,27 +293,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: const Color(0xFF6B7280),
+                        color: const Color(0xFF64748B),
                       ),
                       onPressed: () {
                         setState(() {
-                          _obscurePassword = !_obscurePassword;
+                          _obscurePassword = !_obscurePassword,
                         });
                       },
                     ),
                     filled: true,
-                    fillColor: const Color(0xFFF9FAFB),
+                    fillColor: const Color(0xFFFFFFFF), // Cards color from PDF
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(12), // Rounded corners from PDF
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                      borderSide: const BorderSide(color: Color(0xFF4F46E5)), // Primary Color from PDF
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -324,7 +342,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: const Color(0xFF6B7280),
+                        color: const Color(0xFF64748B),
                       ),
                       onPressed: () {
                         setState(() {
@@ -333,18 +351,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
                     filled: true,
-                    fillColor: const Color(0xFFF9FAFB),
+                    fillColor: const Color(0xFFFFFFFF), // Cards color from PDF
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(12), // Rounded corners from PDF
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                      borderSide: const BorderSide(color: Color(0xFF4F46E5)), // Primary Color from PDF
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -370,7 +388,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           _agreedToTerms = value ?? false;
                         });
                       },
-                      activeColor: const Color(0xFF2563EB),
+                      activeColor: const Color(0xFF4F46E5), // Primary Color from PDF
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -388,14 +406,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             text: const TextSpan(
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Color(0xFF6B7280),
+                                color: Color(0xFF64748B), // Secondary Text color from PDF
                               ),
                               children: [
                                 TextSpan(text: 'I agree to the '),
                                 TextSpan(
                                   text: 'Terms and Conditions',
                                   style: TextStyle(
-                                    color: Color(0xFF2563EB),
+                                    color: Color(0xFF4F46E5), // Primary Color from PDF
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -417,9 +435,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: ElevatedButton(
                     onPressed: _handleCreateAccount,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
+                      backgroundColor: const Color(0xFF4F46E5), // Edit Button color from PDF (same as Primary)
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12), // Rounded corners from PDF
                       ),
                       elevation: 0,
                     ),
@@ -444,7 +462,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       'Already have an account?',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF64748B), // Secondary Text color from PDF
                       ),
                     ),
                     TextButton(
@@ -455,7 +473,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         'Login',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color(0xFF2563EB),
+                          color: Color(0xFF4F46E5), // Primary Color from PDF
                           fontWeight: FontWeight.w600,
                         ),
                       ),

@@ -84,6 +84,47 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        actions: [
+          // Outfit Recommendations button (Weather-based)
+          IconButton(
+            icon: const Icon(
+              Icons.lightbulb_outline,
+              color: Color(0xFF111827),
+            ),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/recommendations');
+            },
+            tooltip: 'Outfit Recommendations',
+          ),
+          // Shopping Recommendations button (Missing items)
+          IconButton(
+            icon: const Icon(
+              Icons.shopping_bag,
+              color: Color(0xFF111827),
+            ),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/shopping-recommendations');
+            },
+            tooltip: 'Shopping Recommendations',
+          ),
+          // History button
+          IconButton(
+            icon: const Icon(
+              Icons.history,
+              color: Color(0xFF111827),
+            ),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/history');
+            },
+            tooltip: 'History',
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -106,11 +147,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     
                     // Weather Card
                     _buildWeatherCard(),
-                    
-                    const SizedBox(height: 20),
-                    
-                    // Quick Actions
-                    _buildQuickActions(),
                     
                     const SizedBox(height: 24),
                     
@@ -438,74 +474,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         // Default fallback
         return const SizedBox.shrink();
       },
-    );
-  }
-
-  /// ============================================
-  /// QUICK ACTIONS
-  /// ============================================
-  Widget _buildQuickActions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildQuickActionButton(
-          icon: Icons.add_a_photo,
-          label: 'Add clothes',
-          onTap: _navigateToCamera,
-        ),
-        _buildQuickActionButton(
-          icon: Icons.checkroom,
-          label: 'Wardrobe',
-          onTap: () => Navigator.of(context).pushNamed('/wardrobe'),
-        ),
-        _buildQuickActionButton(
-          icon: Icons.lightbulb_outline,
-          label: 'Suggestions',
-          onTap: () => Navigator.of(context).pushNamed('/suggestions'),
-        ),
-        _buildQuickActionButton(
-          icon: Icons.history,
-          label: 'History',
-          onTap: () => Navigator.of(context).pushNamed('/history'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              icon,
-              size: 28,
-              color: const Color(0xFF111827),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
     );
   }
 

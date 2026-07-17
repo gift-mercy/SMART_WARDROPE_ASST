@@ -15,6 +15,7 @@ import 'screens/wardrobe/wardrobe_screen.dart';
 import 'screens/wardrobe/clothing_details_screen.dart';
 import 'screens/camera/camera_screen.dart';
 import 'screens/recommendations/recommendation_screen.dart';
+import 'screens/shopping_recommendations/shopping_recommendations_screen.dart';
 
 import 'models/clothing_item.dart';
 
@@ -25,6 +26,7 @@ import 'providers/auth_provider.dart';
 import 'providers/wardrobe_provider.dart';
 import 'providers/profile_provider.dart';
 import 'providers/recommendation_provider.dart';
+import 'providers/shopping_recommendation_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,6 +57,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => WardrobeProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+        ChangeNotifierProvider(create: (_) => ShoppingRecommendationProvider()),
       ],
       child: MaterialApp(
         title: 'Smart Wardrobe Assistant',
@@ -112,6 +115,9 @@ class MyApp extends StatelessWidget {
 
           '/history': (context) =>
               const MyHomePage(title: 'History Screen'),
+
+          '/shopping-recommendations': (context) =>
+              const ShoppingRecommendationsScreen(),
 
           '/profile': (context) =>
               const MyHomePage(title: 'Profile Screen'),

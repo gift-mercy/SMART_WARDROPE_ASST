@@ -297,7 +297,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       onPressed: () {
                         setState(() {
-                          _obscurePassword = !_obscurePassword,
+                          _obscurePassword = !_obscurePassword;
                         });
                       },
                     ),

@@ -1,44 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Camera permissions -->
-    <uses-permission android:name="android.permission.CAMERA" />
-
-    <!-- Storage permissions -->
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29"
-        tools:replace="android:maxSdkVersion" />
-
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-
-    <!-- Weather location permissions -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- Internet permission -->
-    <uses-permission android:name="android.permission.INTERNET" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-    <!-- Camera permission for taking profile pictures -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <!-- Storage permissions for accessing gallery -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" 
-                     android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-                     android:maxSdkVersion="32" />
-    <!-- Photos permission for Android 13+ -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    
->>>>>>> origin/main
-=======
-<!-- Camera permission for taking profile pictures -->
+<!-- Camera permissions -->
 <uses-permission android:name="android.permission.CAMERA" />
 
 <!-- Storage permissions for Android 12 and below -->
@@ -48,48 +11,57 @@
 
 <uses-permission
     android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-    android:maxSdkVersion="32" />
+    android:maxSdkVersion="32"
+    tools:replace="android:maxSdkVersion" />
 
 <!-- Android 13+ image access -->
+
 <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
-    <application
-        android:label="flutter_application_1"
-        android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:taskAffinity=""
-            android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize">
+<!-- Weather location permissions -->
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-            <meta-data
-                android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/NormalTheme" />
+<!-- Internet permission -->
+<uses-permission android:name="android.permission.INTERNET" />
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+<application
+    android:label="flutter_application_1"
+    android:name="${applicationName}"
+    android:icon="@mipmap/ic_launcher">
 
-        </activity>
+    <activity
+        android:name=".MainActivity"
+        android:exported="true"
+        android:launchMode="singleTop"
+        android:taskAffinity=""
+        android:theme="@style/LaunchTheme"
+        android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+        android:hardwareAccelerated="true"
+        android:windowSoftInputMode="adjustResize">
 
         <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
+            android:name="io.flutter.embedding.android.NormalTheme"
+            android:resource="@style/NormalTheme" />
 
-    </application>
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
 
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.PROCESS_TEXT" />
-            <data android:mimeType="text/plain" />
-        </intent>
-    </queries>
+    </activity>
+
+    <meta-data
+        android:name="flutterEmbedding"
+        android:value="2" />
+
+</application>
+
+<queries>
+    <intent>
+        <action android:name="android.intent.action.PROCESS_TEXT" />
+        <data android:mimeType="text/plain" />
+    </intent>
+</queries>
 
 </manifest>

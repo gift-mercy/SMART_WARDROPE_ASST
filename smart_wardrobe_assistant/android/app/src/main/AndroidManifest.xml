@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:tools="http://schemas.android.com/tools">
 
+<<<<<<< Updated upstream
 <!-- Camera permissions -->
 <uses-permission android:name="android.permission.CAMERA" />
 
@@ -9,7 +10,9 @@ xmlns:tools="http://schemas.android.com/tools">
     android:name="android.permission.READ_EXTERNAL_STORAGE"
     android:maxSdkVersion="32" />
 
-<uses-permission
+<uses-permgit add .
+    git commit -m "Fix merged AndroidManifest duplicates and regenerate pubspec"
+    ission
     android:name="android.permission.WRITE_EXTERNAL_STORAGE"
     android:maxSdkVersion="32"
     tools:replace="android:maxSdkVersion" />
@@ -17,6 +20,35 @@ xmlns:tools="http://schemas.android.com/tools">
 <!-- Android 13+ image access -->
 
 <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+=======
+    <!-- Camera permissions -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Storage permissions for Android 12 and below -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"
+        tools:replace="android:maxSdkVersion" />
+
+    <!-- Photos permission for Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- Weather location permissions -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Internet permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:label="smart_wardrobe_assistant"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+>>>>>>> Stashed changes
 
 <!-- Weather location permissions -->
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -51,6 +83,7 @@ xmlns:tools="http://schemas.android.com/tools">
 
     </activity>
 
+<<<<<<< Updated upstream
     <meta-data
         android:name="flutterEmbedding"
         android:value="2" />
@@ -63,5 +96,4 @@ xmlns:tools="http://schemas.android.com/tools">
         <data android:mimeType="text/plain" />
     </intent>
 </queries>
-
 </manifest>

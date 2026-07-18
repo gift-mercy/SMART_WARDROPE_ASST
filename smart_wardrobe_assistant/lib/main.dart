@@ -12,7 +12,12 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/home/home_dashboard_screen.dart';
 import 'screens/wardrobe/wardrobe_screen.dart';
+import 'screens/wardrobe/clothing_details_screen.dart';
 import 'screens/camera/camera_screen.dart';
+import 'screens/recommendations/recommendation_screen.dart';
+import 'screens/shopping_recommendations/shopping_recommendations_screen.dart';
+
+import 'models/clothing_item.dart';
 
 import 'database/database_helper.dart';
 
@@ -20,6 +25,8 @@ import 'providers/weather_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/wardrobe_provider.dart';
 import 'providers/profile_provider.dart';
+import 'providers/recommendation_provider.dart';
+import 'providers/shopping_recommendation_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,12 +56,28 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()..initialize()),
         ChangeNotifierProvider(create: (_) => WardrobeProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+        ChangeNotifierProvider(create: (_) => ShoppingRecommendationProvider()),
       ],
       child: MaterialApp(
         title: 'Smart Wardrobe Assistant',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         initialRoute: '/',
+        onGenerateRoute: (settings) {
+          // Handle routes with arguments
+          if (settings.name == '/clothing-details') {
+            final clothingItem = settings.arguments as ClothingItem;
+            return MaterialPageRoute(
+              builder: (context) => ClothingDetailsScreen(
+                clothingItem: clothingItem,
+              ),
+            );
+          }
+
+          // Return null for routes handled by the routes map
+          return null;
+        },
         routes: {
           '/': (context) => const SplashScreen(),
 
@@ -81,14 +104,20 @@ class MyApp extends StatelessWidget {
           '/add-clothing': (context) =>
               const MyHomePage(title: 'Add Clothing Screen'),
 
-          '/clothing-details': (context) =>
-              const MyHomePage(title: 'Clothing Details Screen'),
+          '/edit-clothing': (context) =>
+              const MyHomePage(title: 'Edit Clothing Screen'),
 
           '/suggestions': (context) =>
-              const MyHomePage(title: 'Suggestions Screen'),
+              const RecommendationScreen(),
+          
+          '/recommendations': (context) =>
+              const RecommendationScreen(),
 
           '/history': (context) =>
               const MyHomePage(title: 'History Screen'),
+
+          '/shopping-recommendations': (context) =>
+              const ShoppingRecommendationsScreen(),
 
           '/profile': (context) =>
               const MyHomePage(title: 'Profile Screen'),

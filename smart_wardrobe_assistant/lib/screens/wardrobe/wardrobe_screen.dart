@@ -324,23 +324,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
         ),
       ),
 
-      // ============================================
-      // FLOATING ACTION BUTTON
-      // ============================================
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to add clothing screen
-          Navigator.pushNamed(context, '/add-clothing').then((_) {
-            // Refresh wardrobe when returning
-            _refreshWardrobe();
-          });
-        },
-        backgroundColor: const Color(0xFF4F46E5),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
+
     );
   }
 

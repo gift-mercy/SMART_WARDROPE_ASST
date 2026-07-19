@@ -12,6 +12,7 @@
 import '../models/clothing_item.dart';
 import '../models/weather_model.dart';
 import '../models/recommendation_model.dart';
+import '../models/calendar_event_model.dart';
 
 /// RecommendationService
 /// Generates outfit recommendations based on weather and available clothing
@@ -25,6 +26,8 @@ class RecommendationService {
   RecommendationModel generateRecommendation({
     required WeatherModel weather,
     required List<ClothingItem> availableClothing,
+    CalendarEventModel? calendarEvent,
+    RecommendationPreference preference = RecommendationPreference.balanced,
   }) {
     // If no clothing available, return empty recommendation
     if (availableClothing.isEmpty) {
@@ -41,12 +44,29 @@ class RecommendationService {
     final selectedItems = _selectClothingForWeather(
       weather: weather,
       availableClothing: availableClothing,
+      calendarEvent: calendarEvent,
+      preference: preference,
     );
+
+    if (calendarEvent != null &&
+        calendarEvent.category != EventCategory.unknown &&
+        !selectedItems.any((item) => _matchesEventCategory(item, calendarEvent.category))) {
+      return RecommendationModel(
+        outfitItems: const [],
+        explanation: 'We could not find a perfect outfit from your current wardrobe. Add more clothing items and try again.',
+        weatherCondition: weather.condition,
+        temperature: weather.temperature,
+        eventCategory: calendarEvent.category,
+        recommendationSource: 'rule-based',
+        confidenceScore: 0,
+      );
+    }
 
     // Generate explanation
     final explanation = _generateExplanation(
       weather: weather,
       selectedItems: selectedItems,
+      calendarEvent: calendarEvent,
     );
 
     return RecommendationModel(
@@ -54,8 +74,9 @@ class RecommendationService {
       explanation: explanation,
       weatherCondition: weather.condition,
       temperature: weather.temperature,
+      eventCategory: calendarEvent?.category,
       recommendationSource: 'rule-based',
-      confidenceScore: _calculateConfidenceScore(selectedItems),
+      confidenceScore: _calculateMatchScore(selectedItems, weather, calendarEvent),
     );
   }
 
@@ -63,6 +84,8 @@ class RecommendationService {
   List<ClothingItem> _selectClothingForWeather({
     required WeatherModel weather,
     required List<ClothingItem> availableClothing,
+    CalendarEventModel? calendarEvent,
+    required RecommendationPreference preference,
   }) {
     final List<ClothingItem> selected = [];
     final temp = weather.temperature;
@@ -95,6 +118,11 @@ class RecommendationService {
     } else {
       preferredOccasions = ['Casual', 'Work', 'Formal'];
     }
+    // A selected event is the strongest intent signal; preferences guide days
+    // without an event instead of overriding an athletic or formal event.
+    preferredOccasions = _eventOccasions(calendarEvent) ??
+        _preferenceOccasions(preference) ??
+        preferredOccasions;
 
     // Score each clothing item based on suitability
     final scoredItems = availableClothing.map((item) {
@@ -111,6 +139,12 @@ class RecommendationService {
           (occasion) => item.occasionName!.toLowerCase().contains(occasion.toLowerCase()))) {
         score += 50;
       }
+
+      // Calendar context deliberately affects only local rule-based scoring.
+      if (calendarEvent != null && _matchesEventCategory(item, calendarEvent.category)) {
+        score += 80;
+      }
+      if (_matchesPreference(item, preference)) score += 25;
 
       // Category-based scoring for hot weather
       if (isHot && item.categoryName != null) {
@@ -188,6 +222,7 @@ class RecommendationService {
   String _generateExplanation({
     required WeatherModel weather,
     required List<ClothingItem> selectedItems,
+    CalendarEventModel? calendarEvent,
   }) {
     if (selectedItems.isEmpty) {
       return 'Add clothing items to your wardrobe to get outfit recommendations.';
@@ -225,6 +260,10 @@ class RecommendationService {
       explanation.write('appropriate for today\'s conditions. ');
     }
 
+    if (calendarEvent != null && calendarEvent.category != EventCategory.unknown) {
+      explanation.write('It also prioritizes ${calendarEvent.categoryName.toLowerCase()} pieces for your upcoming event. ');
+    }
+
     // Add item-specific details if available
     if (selectedItems.length > 1) {
       explanation.write('The combination of ');
@@ -243,21 +282,72 @@ class RecommendationService {
   }
 
   /// Calculate confidence score for the recommendation
-  double _calculateConfidenceScore(List<ClothingItem> selectedItems) {
+  double _calculateMatchScore(
+    List<ClothingItem> selectedItems,
+    WeatherModel weather,
+    CalendarEventModel? event,
+  ) {
     if (selectedItems.isEmpty) return 0.0;
-
-    // Base confidence on number and diversity of items
-    double score = 0.5; // Base score
-
-    // More items = higher confidence (up to 5 items)
-    score += (selectedItems.length.clamp(0, 5) / 5) * 0.3;
-
-    // Diversity bonus (different categories)
-    final categories = selectedItems.map((item) => item.categoryName).toSet();
-    score += (categories.length / selectedItems.length) * 0.2;
-
-    return score.clamp(0.0, 1.0);
+    // Transparent 100-point match: event 50, weather 30, colours 20.
+    final eventScore = event == null || event.category == EventCategory.unknown
+        ? 25.0
+        : (selectedItems.any((item) => _matchesEventCategory(item, event.category)) ? 50.0 : 20.0);
+    final weatherText = '${weather.condition} ${weather.temperature}'.toLowerCase();
+    final weatherScore = selectedItems.any((item) => _isWeatherAppropriate(item, weatherText)) ? 30.0 : 15.0;
+    final colors = selectedItems.map((item) => item.colorName?.toLowerCase()).whereType<String>().toSet();
+    final colorScore = colors.length <= 1 || !colors.contains('blue') || colors.length > 2 ? 20.0 : 12.0;
+    return ((eventScore + weatherScore + colorScore) / 100).clamp(0.0, 1.0);
   }
+
+  bool _isWeatherAppropriate(ClothingItem item, String weatherText) {
+    final text = '${item.categoryName ?? ''} ${item.seasonName ?? ''} ${item.colorName ?? ''}'.toLowerCase();
+    if (weatherText.contains('rain')) return !text.contains('sandal');
+    if (weatherText.contains('30') || weatherText.contains('29') || weatherText.contains('28')) {
+      return _containsAny(text, const ['summer', 'spring', 'shirt', 't-shirt', 'short']);
+    }
+    return true;
+  }
+
+  List<String>? _eventOccasions(CalendarEventModel? event) {
+    if (event == null) return null;
+    return switch (event.category) {
+      EventCategory.formal => const ['Formal', 'Work', 'Business'],
+      EventCategory.professional => const ['Work', 'Business', 'Formal'],
+      EventCategory.athletic => const ['Sport', 'Sports', 'Gym', 'Athletic'],
+      EventCategory.casual => const ['Casual', 'Social', 'Outdoor'],
+      EventCategory.unknown => null,
+    };
+  }
+
+  List<String>? _preferenceOccasions(RecommendationPreference preference) => switch (preference) {
+        RecommendationPreference.balanced => null,
+        RecommendationPreference.formal => const ['Formal', 'Work', 'Business'],
+        RecommendationPreference.casual => const ['Casual', 'Social'],
+        RecommendationPreference.comfortable => const ['Casual', 'Sport', 'Outdoor'],
+      };
+
+  bool _matchesPreference(ClothingItem item, RecommendationPreference preference) {
+    final text = '${item.occasionName ?? ''} ${item.categoryName ?? ''}'.toLowerCase();
+    return switch (preference) {
+      RecommendationPreference.balanced => false,
+      RecommendationPreference.formal => _containsAny(text, const ['formal', 'work', 'business']),
+      RecommendationPreference.casual => _containsAny(text, const ['casual', 'jean', 't-shirt']),
+      RecommendationPreference.comfortable => _containsAny(text, const ['casual', 'sport', 'sneaker', 'track']),
+    };
+  }
+
+  bool _matchesEventCategory(ClothingItem item, EventCategory category) {
+    final text = '${item.occasionName ?? ''} ${item.categoryName ?? ''}'.toLowerCase();
+    return switch (category) {
+      EventCategory.formal => _containsAny(text, const ['formal', 'shirt', 'trouser', 'blazer', 'dress shoe']),
+      EventCategory.professional => _containsAny(text, const ['work', 'business', 'formal', 'shirt', 'trouser']),
+      EventCategory.athletic => _containsAny(text, const ['sport', 'gym', 'athletic', 'track', 'trainer']),
+      EventCategory.casual => _containsAny(text, const ['casual', 't-shirt', 'jean', 'sneaker']),
+      EventCategory.unknown => false,
+    };
+  }
+
+  bool _containsAny(String text, List<String> values) => values.any(text.contains);
 
   /// Future method: Generate recommendation using AI model
   /// This is a placeholder for future AI integration

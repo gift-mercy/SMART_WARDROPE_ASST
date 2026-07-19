@@ -306,8 +306,8 @@ class _ShoppingRecommendationsScreenState
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.secondary.withOpacity(0.1),
-              AppColors.secondary.withOpacity(0.05),
+              AppColors.secondary.withValues(alpha: 0.1),
+              AppColors.secondary.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -403,9 +403,9 @@ class _ShoppingRecommendationsScreenState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -532,7 +532,7 @@ class _ShoppingRecommendationsScreenState
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withOpacity(0.1),
+                    color: AppColors.secondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -584,7 +584,7 @@ class _ShoppingRecommendationsScreenState
                         .map((color) => Chip(
                               label: Text(color),
                               backgroundColor:
-                                  AppColors.primary.withOpacity(0.1),
+                                  AppColors.primary.withValues(alpha: 0.1),
                               labelStyle: const TextStyle(
                                 fontSize: 14,
                                 color: AppColors.primary,
@@ -613,7 +613,7 @@ class _ShoppingRecommendationsScreenState
                         .map((occasion) => Chip(
                               label: Text(occasion),
                               backgroundColor:
-                                  AppColors.secondary.withOpacity(0.1),
+                                  AppColors.secondary.withValues(alpha: 0.1),
                               labelStyle: const TextStyle(
                                 fontSize: 14,
                                 color: AppColors.secondary,

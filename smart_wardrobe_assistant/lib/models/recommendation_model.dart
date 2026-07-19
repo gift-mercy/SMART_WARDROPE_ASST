@@ -6,10 +6,14 @@
 // Purpose:
 // - Represent a recommended outfit
 // - Include explanation for the recommendation
+// - Support calendar event context integration
 // - Support future AI model integration
 // ============================================
 
 import 'clothing_item.dart';
+import 'calendar_event_model.dart';
+
+enum RecommendationPreference { balanced, formal, casual, comfortable }
 
 /// RecommendationModel class
 /// Represents a recommended outfit with explanation
@@ -26,6 +30,9 @@ class RecommendationModel {
   /// Temperature range (in Celsius)
   final double temperature;
 
+  /// Derived category only. Calendar titles and locations are never persisted.
+  final EventCategory? eventCategory;
+
   /// Timestamp when recommendation was generated
   final DateTime timestamp;
 
@@ -35,15 +42,24 @@ class RecommendationModel {
   /// Optional: Source of recommendation (e.g., "rule-based", "ai-model")
   final String? recommendationSource;
 
+  /// Raw event label returned by the pretrained BART-MNLI backend.
+  final String? aiEventType;
+
+  /// Human-readable weather summary returned by the AI backend.
+  final String? aiWeatherSummary;
+
   /// Constructor
   RecommendationModel({
     required this.outfitItems,
     required this.explanation,
     required this.weatherCondition,
     required this.temperature,
+    this.eventCategory,
     DateTime? timestamp,
     this.confidenceScore,
     this.recommendationSource,
+    this.aiEventType,
+    this.aiWeatherSummary,
   }) : timestamp = timestamp ?? DateTime.now();
 
   /// Check if the recommendation is still fresh (less than 3 hours old)
@@ -63,6 +79,8 @@ class RecommendationModel {
   /// Check if outfit is valid (has at least one item)
   bool get isValid => outfitItems.isNotEmpty;
 
+  int get matchPercentage => ((confidenceScore ?? 0) * 100).round();
+
   /// Convert to Map for storage/serialization
   Map<String, dynamic> toMap() {
     return {
@@ -70,9 +88,12 @@ class RecommendationModel {
       'explanation': explanation,
       'weather_condition': weatherCondition,
       'temperature': temperature,
+      'event_category': eventCategory?.name,
       'timestamp': timestamp.toIso8601String(),
       'confidence_score': confidenceScore,
       'recommendation_source': recommendationSource ?? 'rule-based',
+      'ai_event_type': aiEventType,
+      'ai_weather_summary': aiWeatherSummary,
     };
   }
 
@@ -85,9 +106,17 @@ class RecommendationModel {
       explanation: map['explanation'] as String,
       weatherCondition: map['weather_condition'] as String,
       temperature: (map['temperature'] as num).toDouble(),
+      eventCategory: map['event_category'] == null
+          ? null
+          : EventCategory.values.firstWhere(
+              (value) => value.name == map['event_category'],
+              orElse: () => EventCategory.unknown,
+            ),
       timestamp: DateTime.parse(map['timestamp'] as String),
       confidenceScore: map['confidence_score'] as double?,
       recommendationSource: map['recommendation_source'] as String?,
+      aiEventType: map['ai_event_type'] as String?,
+      aiWeatherSummary: map['ai_weather_summary'] as String?,
     );
   }
 
@@ -97,23 +126,29 @@ class RecommendationModel {
     String? explanation,
     String? weatherCondition,
     double? temperature,
+    EventCategory? eventCategory,
     DateTime? timestamp,
     double? confidenceScore,
     String? recommendationSource,
+    String? aiEventType,
+    String? aiWeatherSummary,
   }) {
     return RecommendationModel(
       outfitItems: outfitItems ?? this.outfitItems,
       explanation: explanation ?? this.explanation,
       weatherCondition: weatherCondition ?? this.weatherCondition,
       temperature: temperature ?? this.temperature,
+      eventCategory: eventCategory ?? this.eventCategory,
       timestamp: timestamp ?? this.timestamp,
       confidenceScore: confidenceScore ?? this.confidenceScore,
       recommendationSource: recommendationSource ?? this.recommendationSource,
+      aiEventType: aiEventType ?? this.aiEventType,
+      aiWeatherSummary: aiWeatherSummary ?? this.aiWeatherSummary,
     );
   }
 
   @override
   String toString() {
-    return 'RecommendationModel(items: ${itemCount}, weather: $weatherDisplay, source: ${recommendationSource ?? "rule-based"})';
+    return 'RecommendationModel(items: $itemCount, weather: $weatherDisplay, source: ${recommendationSource ?? "rule-based"})';
   }
 }

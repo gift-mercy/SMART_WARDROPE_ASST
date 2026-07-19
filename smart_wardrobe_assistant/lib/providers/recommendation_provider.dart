@@ -12,8 +12,10 @@
 import 'package:flutter/material.dart';
 import '../models/recommendation_model.dart';
 import '../models/weather_model.dart';
+import '../models/calendar_event_model.dart';
 import '../models/clothing_item.dart';
 import '../services/recommendation_service.dart';
+import '../services/ai_service.dart';
 
 /// Recommendation state enum
 enum RecommendationState {
@@ -35,6 +37,9 @@ class RecommendationProvider with ChangeNotifier {
   RecommendationModel? _recommendation;
   String? _errorMessage;
   final RecommendationService _recommendationService = RecommendationService();
+  final AiService _aiService;
+
+  RecommendationProvider({AiService? aiService}) : _aiService = aiService ?? AiService();
 
   // ============================================
   // GETTERS
@@ -56,6 +61,8 @@ class RecommendationProvider with ChangeNotifier {
   Future<void> generateRecommendation({
     required WeatherModel weather,
     required List<ClothingItem> clothingItems,
+    CalendarEventModel? calendarEvent,
+    RecommendationPreference preference = RecommendationPreference.balanced,
   }) async {
     try {
       _setState(RecommendationState.loading);
@@ -77,11 +84,14 @@ class RecommendationProvider with ChangeNotifier {
       _recommendation = _recommendationService.generateRecommendation(
         weather: weather,
         availableClothing: clothingItems,
+        calendarEvent: calendarEvent,
+        preference: preference,
       );
 
       // Check if recommendation is valid
       if (_recommendation == null || !_recommendation!.isValid) {
-        _errorMessage = 'Unable to generate a suitable outfit recommendation.';
+        _errorMessage = _recommendation?.explanation ??
+            'We could not find a perfect outfit from your current wardrobe. Add more clothing items and try again.';
         _setState(RecommendationState.error);
         return;
       }
@@ -99,10 +109,14 @@ class RecommendationProvider with ChangeNotifier {
   Future<void> refreshRecommendation({
     required WeatherModel weather,
     required List<ClothingItem> clothingItems,
+    CalendarEventModel? calendarEvent,
+    RecommendationPreference preference = RecommendationPreference.balanced,
   }) async {
     await generateRecommendation(
       weather: weather,
       clothingItems: clothingItems,
+      calendarEvent: calendarEvent,
+      preference: preference,
     );
   }
 
@@ -130,6 +144,8 @@ class RecommendationProvider with ChangeNotifier {
   Future<void> generateAIRecommendation({
     required WeatherModel weather,
     required List<ClothingItem> clothingItems,
+    CalendarEventModel? calendarEvent,
+    RecommendationPreference preference = RecommendationPreference.balanced,
   }) async {
     try {
       _setState(RecommendationState.loading);
@@ -147,18 +163,46 @@ class RecommendationProvider with ChangeNotifier {
         return;
       }
 
-      // TODO: Replace with actual AI model call
-      // For now, use rule-based recommendation
-      _recommendation = await _recommendationService.generateAIRecommendation(
+      final aiResult = await _aiService.recommendOutfit(
         weather: weather,
-        availableClothing: clothingItems,
+        wardrobe: clothingItems,
+        calendarEvent: calendarEvent,
+        preference: preference,
+      );
+      if (!aiResult.success) {
+        _errorMessage = aiResult.message;
+        _setState(RecommendationState.error);
+        return;
+      }
+
+      // The backend only returns IDs from the submitted wardrobe. This second
+      // lookup is a client-side guard that prevents invented items from showing.
+      final selectedItems = clothingItems
+          .where((item) => aiResult.itemIds.contains(item.clothingId?.toString()))
+          .toList(growable: false);
+      if (selectedItems.isEmpty) {
+        _errorMessage = 'No suitable outfit could be found from your current wardrobe.';
+        _setState(RecommendationState.error);
+        return;
+      }
+      _recommendation = RecommendationModel(
+        outfitItems: selectedItems,
+        explanation: aiResult.reason,
+        weatherCondition: weather.condition,
+        temperature: weather.temperature,
+        eventCategory: calendarEvent?.category,
+        confidenceScore: aiResult.confidence,
+        recommendationSource: 'pretrained-ai-backend',
+        aiEventType: aiResult.eventType,
+        aiWeatherSummary: aiResult.weatherSummary,
       );
 
       _setState(RecommendationState.loaded);
-      print('AI Recommendation generated: ${_recommendation!.itemCount} items');
-    } catch (e) {
-      print('Error generating AI recommendation: $e');
-      _errorMessage = 'Failed to generate AI recommendation: ${e.toString()}';
+    } on AiServiceException catch (error) {
+      _errorMessage = error.message;
+      _setState(RecommendationState.error);
+    } catch (_) {
+      _errorMessage = 'The AI recommendation could not be generated. Please retry.';
       _setState(RecommendationState.error);
     }
   }

@@ -140,7 +140,7 @@ class ShoppingRecommendationCard extends StatelessWidget {
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-        color: AppColors.secondary.withOpacity(0.1),
+        color: AppColors.secondary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(
@@ -158,15 +158,15 @@ class ShoppingRecommendationCard extends StatelessWidget {
 
     switch (recommendation.priority) {
       case RecommendationPriority.high:
-        backgroundColor = const Color(0xFFEF4444).withOpacity(0.1);
+        backgroundColor = const Color(0xFFEF4444).withValues(alpha: 0.1);
         textColor = const Color(0xFFEF4444);
         break;
       case RecommendationPriority.recommended:
-        backgroundColor = const Color(0xFFF59E0B).withOpacity(0.1);
+        backgroundColor = const Color(0xFFF59E0B).withValues(alpha: 0.1);
         textColor = const Color(0xFFF59E0B);
         break;
       case RecommendationPriority.optional:
-        backgroundColor = const Color(0xFF10B981).withOpacity(0.1);
+        backgroundColor = const Color(0xFF10B981).withValues(alpha: 0.1);
         textColor = const Color(0xFF10B981);
         break;
     }

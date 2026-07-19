@@ -25,33 +25,6 @@ class ShoppingRecommendationService {
       ShoppingRecommendationService._privateConstructor();
 
   // ============================================
-  // WARDROBE ESSENTIALS DEFINITION
-  // ============================================
-
-  /// Define essential wardrobe items by category
-  static const Map<String, List<String>> _wardrobeEssentials = {
-    'Tops': ['White Shirt', 'Black T-Shirt', 'Casual Shirt', 'Polo Shirt'],
-    'Bottoms': ['Blue Jeans', 'Black Trousers', 'Chinos', 'Casual Shorts'],
-    'Footwear': [
-      'Casual Sneakers',
-      'Formal Shoes',
-      'Sport Shoes',
-      'Sandals'
-    ],
-    'Outerwear': ['Jacket', 'Hoodie', 'Blazer', 'Coat'],
-    'Accessories': ['Belt', 'Watch', 'Bag', 'Cap'],
-  };
-
-  /// Category priorities (higher = more important)
-  static const Map<String, int> _categoryPriorities = {
-    'Tops': 10,
-    'Bottoms': 9,
-    'Footwear': 8,
-    'Outerwear': 6,
-    'Accessories': 4,
-  };
-
-  // ============================================
   // MAIN ANALYSIS METHOD
   // ============================================
 

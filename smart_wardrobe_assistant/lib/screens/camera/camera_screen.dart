@@ -123,12 +123,15 @@ class _CameraScreenState extends State<CameraScreen>
     setState(() => _isCapturing = false);
 
     if (result.success && result.imagePath != null) {
-      await Navigator.push(
+      final selectedPath = await Navigator.push<String>(
         context,
         MaterialPageRoute(
           builder: (_) => ImagePreviewScreen(imagePath: result.imagePath!),
         ),
       );
+      if (mounted && selectedPath != null) {
+        Navigator.of(context).pop(selectedPath);
+      }
     } else {
       _showError(result.errorMessage ?? 'Failed to capture image.');
     }
@@ -150,11 +153,14 @@ class _CameraScreenState extends State<CameraScreen>
     setState(() => _flashMode = nextMode);
   }
 
-  void _openGallery() {
-    Navigator.push(
+  Future<void> _openGallery() async {
+    final selectedPath = await Navigator.push<String>(
       context,
       MaterialPageRoute(builder: (_) => const GalleryScreen()),
     );
+    if (mounted && selectedPath != null) {
+      Navigator.of(context).pop(selectedPath);
+    }
   }
 
   void _showError(String message) {

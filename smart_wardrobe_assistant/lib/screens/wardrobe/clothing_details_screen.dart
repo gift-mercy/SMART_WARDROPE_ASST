@@ -367,7 +367,7 @@ class _ClothingDetailsScreenState extends State<ClothingDetailsScreen> {
             Icon(
               Icons.checkroom,
               size: 80,
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(

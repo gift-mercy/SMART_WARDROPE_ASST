@@ -81,7 +81,7 @@ class EmptyWardrobeWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF4F46E5).withOpacity(0.1),
+                color: const Color(0xFF4F46E5).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(

@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:provider/provider.dart';
 
 import 'core/themes/app_theme.dart';
+import 'core/themes/dark_theme.dart';
 
 import 'screens/splash/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
@@ -12,10 +13,15 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/home/home_dashboard_screen.dart';
 import 'screens/wardrobe/wardrobe_screen.dart';
+import 'screens/wardrobe/add_clothing_screen.dart';
 import 'screens/wardrobe/clothing_details_screen.dart';
 import 'screens/camera/camera_screen.dart';
+import 'screens/camera/background_removal_preview_screen.dart';
 import 'screens/recommendations/recommendation_screen.dart';
 import 'screens/shopping_recommendations/shopping_recommendations_screen.dart';
+import 'screens/calendar/calendar_screen.dart';
+import 'screens/settings/settings_screen.dart';
+import 'screens/home/feature_placeholder_screen.dart';
 
 import 'models/clothing_item.dart';
 
@@ -27,6 +33,9 @@ import 'providers/wardrobe_provider.dart';
 import 'providers/profile_provider.dart';
 import 'providers/recommendation_provider.dart';
 import 'providers/shopping_recommendation_provider.dart';
+import 'providers/calendar_provider.dart';
+import 'providers/theme_provider.dart';
+import 'providers/settings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,11 +67,17 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => RecommendationProvider()),
         ChangeNotifierProvider(create: (_) => ShoppingRecommendationProvider()),
+        ChangeNotifierProvider(create: (_) => CalendarProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()..initialize()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()..initialize()),
       ],
-      child: MaterialApp(
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) => MaterialApp(
         title: 'Smart Wardrobe Assistant',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
+        darkTheme: DarkTheme.theme,
+        themeMode: themeProvider.themeMode,
         initialRoute: '/',
         onGenerateRoute: (settings) {
           // Handle routes with arguments
@@ -71,6 +86,22 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => ClothingDetailsScreen(
                 clothingItem: clothingItem,
+              ),
+            );
+          }
+
+          if (settings.name == '/add-clothing') {
+            return MaterialPageRoute(
+              builder: (context) => AddClothingScreen(
+                initialImagePath: settings.arguments as String?,
+              ),
+            );
+          }
+
+          if (settings.name == '/background-removal-preview') {
+            return MaterialPageRoute(
+              builder: (context) => BackgroundRemovalPreviewScreen(
+                originalImagePath: settings.arguments as String,
               ),
             );
           }
@@ -101,9 +132,6 @@ class MyApp extends StatelessWidget {
           '/otp-verification': (context) =>
               const MyHomePage(title: 'OTP Verification Screen'),
 
-          '/add-clothing': (context) =>
-              const MyHomePage(title: 'Add Clothing Screen'),
-
           '/edit-clothing': (context) =>
               const MyHomePage(title: 'Edit Clothing Screen'),
 
@@ -119,12 +147,35 @@ class MyApp extends StatelessWidget {
           '/shopping-recommendations': (context) =>
               const ShoppingRecommendationsScreen(),
 
+          '/calendar': (context) => const CalendarScreen(),
+
+          '/settings': (context) => const SettingsScreen(),
+
+          '/style-tips': (context) => const FeaturePlaceholderScreen(
+                title: 'Style Tips',
+                icon: Icons.lightbulb_outline,
+                message: 'Style tips will appear here as your wardrobe grows.',
+              ),
+
+          '/outfit-history': (context) => const FeaturePlaceholderScreen(
+                title: 'Outfit History',
+                icon: Icons.shopping_bag_outlined,
+                message: 'Your saved outfit history will appear here.',
+              ),
+
+          '/activity-history': (context) => const FeaturePlaceholderScreen(
+                title: 'Activity History',
+                icon: Icons.history,
+                message: 'Your wardrobe activity will appear here.',
+              ),
+
           '/profile': (context) =>
               const MyHomePage(title: 'Profile Screen'),
 
           '/search': (context) =>
               const MyHomePage(title: 'Search Screen'),
         },
+        ),
       ),
     );
   }

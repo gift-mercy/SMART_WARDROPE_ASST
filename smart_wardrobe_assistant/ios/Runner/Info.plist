@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
+		<key>NSCameraUsageDescription</key>
+		<string>Smart Wardrobe Assistant uses the camera to add clothing items to your wardrobe.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Smart Wardrobe Assistant lets you choose clothing photos from your library.</string>
+		<key>NSCalendarsFullAccessUsageDescription</key>
+		<string>Smart Wardrobe Assistant reads upcoming events to suggest suitable outfits.</string>
+		<key>NSCalendarsUsageDescription</key>
+		<string>Smart Wardrobe Assistant reads upcoming events to suggest suitable outfits.</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

@@ -88,12 +88,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         gender: null, // Can add gender field to form if needed
       ).then((success) async {
+        if (!mounted) return;
         if (success) {
           // Auto-login after registration
           final loginSuccess = await authProvider.login(
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
+
+          if (!mounted) return;
           
           if (loginSuccess) {
             // Show success message

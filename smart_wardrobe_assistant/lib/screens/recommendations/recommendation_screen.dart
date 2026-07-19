@@ -21,7 +21,11 @@ import '../../providers/recommendation_provider.dart';
 import '../../providers/weather_provider.dart';
 import '../../providers/wardrobe_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/calendar_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../models/clothing_item.dart';
+import '../../models/recommendation_model.dart';
+import '../../models/weather_model.dart';
 
 /// RecommendationScreen
 /// Displays personalized outfit recommendations based on weather
@@ -45,6 +49,8 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
     final wardrobeProvider = Provider.of<WardrobeProvider>(context, listen: false);
     final recommendationProvider = Provider.of<RecommendationProvider>(context, listen: false);
+    final calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
     // Set user ID for wardrobe
     final userId = authProvider.currentUser?.userId;
@@ -56,12 +62,15 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     if (!weatherProvider.hasData) {
       await weatherProvider.initializeWeather();
     }
+    await calendarProvider.initialize();
 
     // Generate recommendation
     if (weatherProvider.hasData && wardrobeProvider.clothingItems.isNotEmpty) {
-      await recommendationProvider.generateRecommendation(
+      await recommendationProvider.generateAIRecommendation(
         weather: weatherProvider.weather!,
         clothingItems: wardrobeProvider.clothingItems,
+        calendarEvent: calendarProvider.selectedEvent,
+        preference: settingsProvider.outfitPreference,
       );
     } else if (wardrobeProvider.clothingItems.isEmpty) {
       // Handle empty wardrobe
@@ -74,18 +83,23 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
     final wardrobeProvider = Provider.of<WardrobeProvider>(context, listen: false);
     final recommendationProvider = Provider.of<RecommendationProvider>(context, listen: false);
+    final calendarProvider = Provider.of<CalendarProvider>(context, listen: false);
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
 
     // Refresh weather
     await weatherProvider.refreshWeather();
 
     // Refresh wardrobe
     await wardrobeProvider.refreshWardrobe();
+    await calendarProvider.refreshEvents();
 
     // Generate new recommendation
     if (weatherProvider.hasData) {
-      await recommendationProvider.generateRecommendation(
+      await recommendationProvider.generateAIRecommendation(
         weather: weatherProvider.weather!,
         clothingItems: wardrobeProvider.clothingItems,
+        calendarEvent: calendarProvider.selectedEvent,
+        preference: settingsProvider.outfitPreference,
       );
     }
   }
@@ -143,8 +157,8 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
       body: RefreshIndicator(
         onRefresh: _refreshRecommendation,
         color: AppColors.primary,
-        child: Consumer3<RecommendationProvider, WeatherProvider, WardrobeProvider>(
-          builder: (context, recommendationProvider, weatherProvider, wardrobeProvider, child) {
+        child: Consumer5<RecommendationProvider, WeatherProvider, WardrobeProvider, CalendarProvider, SettingsProvider>(
+          builder: (context, recommendationProvider, weatherProvider, wardrobeProvider, calendarProvider, settingsProvider, child) {
             // ============================================
             // LOADING STATE
             // ============================================
@@ -194,6 +208,13 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
 
                     const SizedBox(height: 24),
 
+                    _buildEventSection(calendarProvider),
+
+                    if (recommendationProvider.hasRecommendation)
+                      _buildAiContext(recommendationProvider.recommendation!),
+
+                    const SizedBox(height: 24),
+
                     // Recommended Outfit Section
                     if (recommendationProvider.hasRecommendation)
                       _buildRecommendedOutfit(recommendationProvider.recommendation!),
@@ -203,6 +224,11 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                     // Recommendation Explanation
                     if (recommendationProvider.hasRecommendation)
                       _buildRecommendationExplanation(recommendationProvider.recommendation!),
+
+                    if (recommendationProvider.hasRecommendation) ...[
+                      const SizedBox(height: 16),
+                      _buildMatchScore(recommendationProvider.recommendation!),
+                    ],
 
                     const SizedBox(height: 32),
                   ],
@@ -241,7 +267,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
   }
 
   /// Build weather section
-  Widget _buildWeatherSection(weather) {
+  Widget _buildWeatherSection(WeatherModel weather) {
     return Card(
       elevation: 2,
       shadowColor: AppColors.shadow,
@@ -269,7 +295,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -309,7 +335,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                     weather.condition,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -321,8 +347,125 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     );
   }
 
+  Widget _buildEventSection(CalendarProvider provider) {
+    final event = provider.selectedEvent;
+    return Card(
+      elevation: 1,
+      child: ListTile(
+        leading: const Icon(Icons.event, color: AppColors.primary),
+        title: Text(event?.title ?? 'No calendar event selected'),
+        subtitle: Text(event == null
+            ? 'Recommendations will use your weather and wardrobe.'
+            : '${event.isToday ? 'Today' : event.formattedDate} • ${event.timeRange}'),
+        trailing: TextButton(
+          onPressed: provider.hasPermission ? _showEventPicker : null,
+          child: const Text('Change'),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMatchScore(RecommendationModel recommendation) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const Icon(Icons.verified_outlined, color: AppColors.success),
+            const SizedBox(width: 10),
+            Text('${recommendation.matchPercentage}% Match',
+                style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAiContext(RecommendationModel recommendation) {
+    if (recommendation.recommendationSource != 'pretrained-ai-backend') {
+      return const SizedBox.shrink();
+    }
+    final confidence = recommendation.confidenceScore ?? 0;
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'AI analysis',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Pretrained model (BART-MNLI): event classified as '
+                '${_formatEventType(recommendation.aiEventType)}.',
+              ),
+              Text('AI confidence: ${(confidence * 100).toStringAsFixed(1)}%'),
+              Text(
+                'Weather: ${recommendation.aiWeatherSummary ?? recommendation.weatherDisplay}',
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Application logic: selected clothing from your wardrobe that matches '
+                'the event and current weather.',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatEventType(String? eventType) {
+    if (eventType == null || eventType.isEmpty) return 'General';
+    return eventType[0].toUpperCase() + eventType.substring(1);
+  }
+
+  Future<void> _showEventPicker() async {
+    final provider = context.read<CalendarProvider>();
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            const ListTile(title: Text('Choose an upcoming event')),
+            ListTile(
+              leading: const Icon(Icons.wb_sunny_outlined),
+              title: const Text('No event'),
+              subtitle: const Text('Use weather and wardrobe only'),
+              onTap: () {
+                provider.selectEvent(null);
+                Navigator.pop(sheetContext);
+              },
+            ),
+            ...provider.upcomingEvents.map((event) => ListTile(
+                  leading: const Icon(Icons.event_outlined),
+                  title: Text(event.title),
+                  subtitle: Text('${event.formattedDate} • ${event.timeRange}'),
+                  selected: provider.selectedEvent?.id == event.id,
+                  onTap: () {
+                    provider.selectEvent(event);
+                    Navigator.pop(sheetContext);
+                  },
+                )),
+          ],
+        ),
+      ),
+    );
+    if (mounted) await _refreshRecommendation();
+  }
+
   /// Build recommended outfit section
-  Widget _buildRecommendedOutfit(recommendation) {
+  Widget _buildRecommendedOutfit(RecommendationModel recommendation) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -441,14 +584,14 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
         child: Icon(
           Icons.checkroom,
           size: 48,
-          color: AppColors.primary.withOpacity(0.3),
+          color: AppColors.primary.withValues(alpha: 0.3),
         ),
       ),
     );
   }
 
   /// Build recommendation explanation
-  Widget _buildRecommendationExplanation(recommendation) {
+  Widget _buildRecommendationExplanation(RecommendationModel recommendation) {
     return Card(
       elevation: 2,
       shadowColor: AppColors.shadow,
@@ -596,7 +739,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

@@ -7,8 +7,11 @@ import 'package:provider/provider.dart';
 import '../../providers/weather_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/profile_provider.dart';
+import '../../providers/calendar_provider.dart';
 import '../../services/greeting_service.dart';
 import '../../widgets/profile_avatar.dart';
+import '../../widgets/calendar_event_card.dart';
+import '../../core/constants/app_colors.dart';
 
 
 class HomeDashboardScreen extends StatefulWidget {
@@ -30,6 +33,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     // Initialize weather when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<WeatherProvider>().initializeWeather();
+      // This checks the existing permission only; it never prompts from Home.
+      context.read<CalendarProvider>().initialize();
       
       // Initialize profile provider with current user ID
       final authProvider = context.read<AuthProvider>();
@@ -89,38 +94,21 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         elevation: 0,
         automaticallyImplyLeading: false,
         actions: [
-          // Outfit Recommendations button (Weather-based)
-          IconButton(
-            icon: const Icon(
-              Icons.lightbulb_outline,
-              color: Color(0xFF111827),
-            ),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/recommendations');
-            },
-            tooltip: 'Outfit Recommendations',
-          ),
-          // Shopping Recommendations button (Missing items)
-          IconButton(
-            icon: const Icon(
-              Icons.shopping_bag,
-              color: Color(0xFF111827),
-            ),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/shopping-recommendations');
-            },
-            tooltip: 'Shopping Recommendations',
-          ),
-          // History button
-          IconButton(
-            icon: const Icon(
-              Icons.history,
-              color: Color(0xFF111827),
-            ),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/history');
-            },
-            tooltip: 'History',
+          PopupMenuButton<String>(
+            tooltip: 'Menu',
+            offset: const Offset(0, 52),
+            elevation: 5,
+            color: AppColors.card,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            icon: const Icon(Icons.menu_rounded, color: AppColors.textPrimary),
+            onSelected: (route) => Navigator.of(context).pushNamed(route),
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: '/settings', child: _HomeMenuItem(icon: Icons.settings_outlined, label: 'Settings')),
+              PopupMenuItem(value: '/calendar', child: _HomeMenuItem(icon: Icons.calendar_month_outlined, label: 'Calendar')),
+              PopupMenuItem(value: '/style-tips', child: _HomeMenuItem(icon: Icons.lightbulb_outline, label: 'Style Tips')),
+              PopupMenuItem(value: '/outfit-history', child: _HomeMenuItem(icon: Icons.shopping_bag_outlined, label: 'Outfit History')),
+              PopupMenuItem(value: '/activity-history', child: _HomeMenuItem(icon: Icons.history, label: 'Activity History')),
+            ],
           ),
           const SizedBox(width: 8),
         ],
@@ -147,6 +135,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     
                     // Weather Card
                     _buildWeatherCard(),
+
+                    const SizedBox(height: 24),
+
+                    // Compact calendar context, when the user has opted in.
+                    _buildNextEventSection(),
                     
                     const SizedBox(height: 24),
                     
@@ -473,6 +466,36 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
         // Default fallback
         return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildNextEventSection() {
+    return Consumer<CalendarProvider>(
+      builder: (context, calendarProvider, child) {
+        final event = calendarProvider.nextEvent;
+        if (!calendarProvider.hasPermission || event == null) {
+          return const SizedBox.shrink();
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Next Event',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF111827),
+              ),
+            ),
+            const SizedBox(height: 10),
+            CalendarEventCard(
+              event: event,
+              isCompact: true,
+              onTap: () => Navigator.of(context).pushNamed('/calendar'),
+            ),
+          ],
+        );
       },
     );
   }
@@ -813,4 +836,23 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       ],
     );
   }
+}
+
+class _HomeMenuItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _HomeMenuItem({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.textSecondary, size: 22),
+            const SizedBox(width: 14),
+            Text(label, style: const TextStyle(color: AppColors.textPrimary, fontSize: 15)),
+          ],
+        ),
+      );
 }

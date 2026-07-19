@@ -53,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       ).then((success) {
+        if (!mounted) return;
         if (success) {
           // Navigate to home on successful login
           Navigator.of(context).pushReplacementNamed('/home');

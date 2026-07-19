@@ -90,7 +90,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final user = await _authService.register(
+      await _authService.register(
         fullName: fullName,
         email: email,
         password: password,

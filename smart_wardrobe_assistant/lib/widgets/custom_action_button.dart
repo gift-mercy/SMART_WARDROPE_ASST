@@ -48,7 +48,7 @@ class CustomActionButton extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor ?? Colors.white,
         elevation: 2,
-        shadowColor: backgroundColor.withOpacity(0.3),
+        shadowColor: backgroundColor.withValues(alpha: 0.3),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

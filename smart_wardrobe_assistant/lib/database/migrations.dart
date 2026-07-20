@@ -24,7 +24,7 @@ class DatabaseMigrations {
 
   /// Current database version
   /// Increment this number whenever you make schema changes
-  static const int currentVersion = 1;
+  static const int currentVersion = 2;
 
   /// ============================================
   /// MIGRATE DATABASE
@@ -55,13 +55,20 @@ class DatabaseMigrations {
   ) async {
     print('Migrating database from version $oldVersion to $newVersion');
 
-    // Example: If you need to migrate from version 1 to version 2
-    // Uncomment and modify this code when you release version 2
-    /*
     if (oldVersion < 2) {
-      await _migrateToV2(db);
+      await db.execute('''
+        CREATE TABLE manual_calendar_events (
+          event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          description TEXT,
+          start_time TEXT NOT NULL,
+          end_time TEXT,
+          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY(user_id) REFERENCES users(user_id)
+        )
+      ''');
     }
-    */
 
     // Example: If you need to migrate from version 2 to version 3
     /*

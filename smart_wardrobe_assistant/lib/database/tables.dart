@@ -26,6 +26,7 @@ class TableNames {
   static const String aiRecommendations = 'ai_recommendations';
   static const String shoppingRecommendations = 'shopping_recommendations';
   static const String weatherCache = 'weather_cache';
+  static const String manualCalendarEvents = 'manual_calendar_events';
 }
 
 /// Database table creation SQL statements
@@ -224,6 +225,21 @@ class TableSchemas {
     )
   ''';
 
+  /// Locally-created schedule items. Device calendar data is never copied into
+  /// SQLite; only events explicitly created in the app are stored here.
+  static const String manualCalendarEvents = '''
+    CREATE TABLE ${TableNames.manualCalendarEvents} (
+      event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      start_time TEXT NOT NULL,
+      end_time TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES ${TableNames.users}(user_id)
+    )
+  ''';
+
   /// ============================================
   /// ALL TABLES LIST
   /// ============================================
@@ -241,6 +257,7 @@ class TableSchemas {
       aiRecommendations,
       shoppingRecommendations,
       weatherCache,
+      manualCalendarEvents,
     ];
   }
 }

@@ -68,7 +68,7 @@ class _ClothingDetailsScreenState extends State<ClothingDetailsScreen> {
           borderRadius: BorderRadius.circular(16),
         ),
         title: Text(
-          'Delete Clothing?',
+          'Delete Clothing Item?',
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -244,131 +244,7 @@ class _ClothingDetailsScreenState extends State<ClothingDetailsScreen> {
     });
   }
 
-  /// Show more options menu
-  void _showMoreOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
 
-              // Title
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  'More Options',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-
-              const Divider(height: 1),
-
-              // Share option
-              ListTile(
-                leading: const Icon(
-                  Icons.share_outlined,
-                  color: AppColors.primary,
-                ),
-                title: Text(
-                  'Share',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Implement share functionality
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Share feature coming soon',
-                        style: GoogleFonts.poppins(fontSize: 14),
-                      ),
-                      backgroundColor: AppColors.primary,
-                    ),
-                  );
-                },
-              ),
-
-              // Favorite option
-              ListTile(
-                leading: const Icon(
-                  Icons.favorite_outline,
-                  color: AppColors.secondary,
-                ),
-                title: Text(
-                  'Add to Favorites',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Implement favorite functionality
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Favorites feature coming soon',
-                        style: GoogleFonts.poppins(fontSize: 14),
-                      ),
-                      backgroundColor: AppColors.secondary,
-                    ),
-                  );
-                },
-              ),
-
-              // Delete option
-              ListTile(
-                leading: const Icon(
-                  Icons.delete_outline,
-                  color: AppColors.error,
-                ),
-                title: Text(
-                  'Delete',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: AppColors.error,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showDeleteConfirmationDialog();
-                },
-              ),
-
-              const SizedBox(height: 16),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -396,16 +272,7 @@ class _ClothingDetailsScreenState extends State<ClothingDetailsScreen> {
             color: AppColors.textPrimary,
           ),
         ),
-        actions: [
-          // More options button
-          IconButton(
-            icon: const Icon(
-              Icons.more_vert,
-              color: AppColors.textPrimary,
-            ),
-            onPressed: _showMoreOptions,
-          ),
-        ],
+
       ),
 
       // ============================================
@@ -435,12 +302,6 @@ class _ClothingDetailsScreenState extends State<ClothingDetailsScreen> {
             _buildDetailsCard(),
 
             const SizedBox(height: 16),
-
-            // ============================================
-            // NOTES CARD
-            // ============================================
-            if (_clothingItem.notes != null && _clothingItem.notes!.isNotEmpty)
-              _buildNotesCard(),
 
             const SizedBox(height: 24),
 
@@ -506,7 +367,7 @@ class _ClothingDetailsScreenState extends State<ClothingDetailsScreen> {
             Icon(
               Icons.checkroom,
               size: 80,
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
@@ -593,82 +454,11 @@ class _ClothingDetailsScreenState extends State<ClothingDetailsScreen> {
 
               const SizedBox(height: 12),
 
-              // Season
-              DetailItem(
-                icon: Icons.wb_sunny,
-                label: 'Season',
-                value: _clothingItem.seasonName ?? 'All Seasons',
-              ),
-
-              const SizedBox(height: 12),
-
-              // Occasion
-              DetailItem(
-                icon: Icons.event,
-                label: 'Occasion',
-                value: _clothingItem.occasionName ?? 'Any Occasion',
-              ),
-
-              const SizedBox(height: 12),
-
               // Date Added
               DetailItem(
                 icon: Icons.calendar_today,
                 label: 'Date Added',
                 value: _formatDate(_clothingItem.dateAdded),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Build notes card
-  Widget _buildNotesCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Card(
-        elevation: 2,
-        shadowColor: AppColors.shadow,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Notes title with icon
-              Row(
-                children: [
-                  const Icon(
-                    Icons.note,
-                    size: 20,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Notes',
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Notes content
-              Text(
-                _clothingItem.notes!,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
               ),
             ],
           ),

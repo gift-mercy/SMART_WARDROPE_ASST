@@ -7,8 +7,11 @@ import 'package:provider/provider.dart';
 import '../../providers/weather_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/profile_provider.dart';
+import '../../providers/calendar_provider.dart';
 import '../../services/greeting_service.dart';
 import '../../widgets/profile_avatar.dart';
+import '../../widgets/calendar_event_card.dart';
+import '../../core/constants/app_colors.dart';
 
 
 class HomeDashboardScreen extends StatefulWidget {
@@ -30,6 +33,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     // Initialize weather when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<WeatherProvider>().initializeWeather();
+      // This checks the existing permission only; it never prompts from Home.
+      context.read<CalendarProvider>().initialize();
       
       // Initialize profile provider with current user ID
       final authProvider = context.read<AuthProvider>();
@@ -84,6 +89,30 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        actions: [
+          PopupMenuButton<String>(
+            tooltip: 'Menu',
+            offset: const Offset(0, 52),
+            elevation: 5,
+            color: AppColors.card,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            icon: const Icon(Icons.menu_rounded, color: AppColors.textPrimary),
+            onSelected: (route) => Navigator.of(context).pushNamed(route),
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: '/settings', child: _HomeMenuItem(icon: Icons.settings_outlined, label: 'Settings')),
+              PopupMenuItem(value: '/calendar', child: _HomeMenuItem(icon: Icons.calendar_month_outlined, label: 'Calendar')),
+              PopupMenuItem(value: '/style-tips', child: _HomeMenuItem(icon: Icons.lightbulb_outline, label: 'Style Tips')),
+              PopupMenuItem(value: '/outfit-history', child: _HomeMenuItem(icon: Icons.shopping_bag_outlined, label: 'Outfit History')),
+              PopupMenuItem(value: '/activity-history', child: _HomeMenuItem(icon: Icons.history, label: 'Activity History')),
+            ],
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -106,11 +135,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     
                     // Weather Card
                     _buildWeatherCard(),
-                    
-                    const SizedBox(height: 20),
-                    
-                    // Quick Actions
-                    _buildQuickActions(),
+
+                    const SizedBox(height: 24),
+
+                    // Compact calendar context, when the user has opted in.
+                    _buildNextEventSection(),
                     
                     const SizedBox(height: 24),
                     
@@ -441,71 +470,33 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     );
   }
 
-  /// ============================================
-  /// QUICK ACTIONS
-  /// ============================================
-  Widget _buildQuickActions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildQuickActionButton(
-          icon: Icons.add_a_photo,
-          label: 'Add clothes',
-          onTap: _navigateToCamera,
-        ),
-        _buildQuickActionButton(
-          icon: Icons.checkroom,
-          label: 'Wardrobe',
-          onTap: () => Navigator.of(context).pushNamed('/wardrobe'),
-        ),
-        _buildQuickActionButton(
-          icon: Icons.lightbulb_outline,
-          label: 'Suggestions',
-          onTap: () => Navigator.of(context).pushNamed('/suggestions'),
-        ),
-        _buildQuickActionButton(
-          icon: Icons.history,
-          label: 'History',
-          onTap: () => Navigator.of(context).pushNamed('/history'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.circular(12),
+  Widget _buildNextEventSection() {
+    return Consumer<CalendarProvider>(
+      builder: (context, calendarProvider, child) {
+        final event = calendarProvider.nextEvent;
+        if (!calendarProvider.hasPermission || event == null) {
+          return const SizedBox.shrink();
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Next Event',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF111827),
+              ),
             ),
-            child: Icon(
-              icon,
-              size: 28,
-              color: const Color(0xFF111827),
+            const SizedBox(height: 10),
+            CalendarEventCard(
+              event: event,
+              isCompact: true,
+              onTap: () => Navigator.of(context).pushNamed('/calendar'),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 
@@ -845,4 +836,23 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       ],
     );
   }
+}
+
+class _HomeMenuItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _HomeMenuItem({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.textSecondary, size: 22),
+            const SizedBox(width: 14),
+            Text(label, style: const TextStyle(color: AppColors.textPrimary, fontSize: 15)),
+          ],
+        ),
+      );
 }

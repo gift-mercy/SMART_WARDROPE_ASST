@@ -144,6 +144,6 @@ class WeatherModel {
 
   @override
   String toString() {
-    return 'WeatherModel(city: $cityName, temp: ${temperatureDisplay}, condition: $condition)';
+    return 'WeatherModel(city: $cityName, temp: $temperatureDisplay, condition: $condition)';
   }
 }

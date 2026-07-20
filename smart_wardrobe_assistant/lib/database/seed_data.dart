@@ -27,7 +27,7 @@ class SeedData {
   /// Parameters:
   /// - db: Database instance
   ///
-  /// Returns: Future<void>
+  /// Returns a `Future<void>`.
   static Future<void> insertAllSeedData(Database db) async {
     // Use a transaction to ensure all seed data is inserted atomically
     // If any insert fails, all changes will be rolled back

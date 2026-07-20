@@ -48,12 +48,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
       }
       // Navigate to preview
       if (mounted) {
-        await Navigator.push(
+        final selectedPath = await Navigator.push<String>(
           context,
           MaterialPageRoute(
             builder: (_) => ImagePreviewScreen(imagePath: result.imagePath!),
           ),
         );
+        if (mounted && selectedPath != null) {
+          Navigator.of(context).pop(selectedPath);
+        }
       }
     } else if (result.errorMessage != null &&
         result.errorMessage != 'No image selected.') {

@@ -224,6 +224,26 @@ class WardrobeProvider with ChangeNotifier {
     await loadWardrobe();
   }
 
+  /// Saves an item using the application's existing SQLite wardrobe table and
+  /// refreshes the in-memory list so the Wardrobe screen updates immediately.
+  Future<bool> addClothingItem(ClothingItem item) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      final db = await DatabaseHelper.instance.database;
+      await db.insert(TableNames.clothingItems, item.toMap());
+      await loadWardrobe();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = 'Failed to save clothing item. Please try again.';
+      notifyListeners();
+      return false;
+    }
+  }
+
   // ============================================
   // DELETE CLOTHING ITEM
   // ============================================

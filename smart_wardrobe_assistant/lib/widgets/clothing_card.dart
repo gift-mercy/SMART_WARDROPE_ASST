@@ -58,22 +58,25 @@ class ClothingCard extends StatelessWidget {
               flex: 3,
               child: Stack(
                 children: [
-                  // Clothing Image
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+                  // Clothing Image with Hero Animation
+                  Hero(
+                    tag: 'clothing_${item.clothingId}',
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                        color: const Color(0xFFF8FAFC),
                       ),
-                      color: const Color(0xFFF8FAFC),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                        child: _buildImage(),
                       ),
-                      child: _buildImage(),
                     ),
                   ),
 
@@ -84,7 +87,7 @@ class ClothingCard extends StatelessWidget {
                       right: 8,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(

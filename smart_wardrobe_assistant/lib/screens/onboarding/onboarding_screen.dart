@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/onboarding_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -32,20 +33,53 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  void _nextPage() {
+  /// Navigate to next page or complete onboarding
+  /// If on last page, mark onboarding as completed and navigate to login
+  Future<void> _nextPage() async {
     if (_currentPage < 2) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      // Navigate to login screen
-      Navigator.of(context).pushReplacementNamed('/login');
+      // User has finished onboarding, mark it as completed
+      await _completeOnboarding();
     }
   }
 
-  void _skipToLogin() {
-    Navigator.of(context).pushReplacementNamed('/login');
+  /// Skip onboarding and go to login
+  /// Also marks onboarding as completed
+  Future<void> _skipToLogin() async {
+    await _completeOnboarding();
+  }
+
+  /// Mark onboarding as completed and navigate to login screen
+  /// This method:
+  /// 1. Calls OnboardingService to save completion status
+  /// 2. Navigates to login screen
+  Future<void> _completeOnboarding() async {
+    try {
+      // Mark onboarding as completed in SharedPreferences
+      await OnboardingService.instance.completeOnboarding();
+      
+      // Navigate to login screen
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    } catch (e) {
+      // If saving fails, still navigate to login but log the error
+      print('Error completing onboarding: $e');
+      
+      // Show error message to user (optional)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error saving progress. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override

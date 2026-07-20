@@ -70,6 +70,33 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
     await wardrobeProvider.refreshWardrobe();
   }
 
+  Future<void> _startClothingCapture() async {
+    try {
+      final imagePath = await Navigator.of(context).pushNamed('/camera') as String?;
+      if (!mounted || imagePath == null || imagePath.isEmpty) return;
+
+      final processedPath = await Navigator.of(context).pushNamed(
+        '/background-removal-preview',
+        arguments: imagePath,
+      );
+      if (!mounted) return;
+      if (processedPath == '__retake__') {
+        await _startClothingCapture();
+        return;
+      }
+      if (processedPath is! String || processedPath.isEmpty) return;
+
+      await Navigator.of(context).pushNamed('/add-clothing', arguments: processedPath);
+      if (mounted) await _refreshWardrobe();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to open the camera. Please try again.')),
+        );
+      }
+    }
+  }
+
   /// Show filter bottom sheet
   void _showFilterBottomSheet() {
     showModalBottomSheet(
@@ -171,6 +198,14 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
           ),
           const SizedBox(width: 8),
         ],
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: _startClothingCapture,
+        backgroundColor: const Color(0xFF4F46E5),
+        foregroundColor: Colors.white,
+        tooltip: 'Add clothing item',
+        child: const Icon(Icons.add),
       ),
 
       // ============================================
@@ -324,23 +359,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
         ),
       ),
 
-      // ============================================
-      // FLOATING ACTION BUTTON
-      // ============================================
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to add clothing screen
-          Navigator.pushNamed(context, '/add-clothing').then((_) {
-            // Refresh wardrobe when returning
-            _refreshWardrobe();
-          });
-        },
-        backgroundColor: const Color(0xFF4F46E5),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
+
     );
   }
 

@@ -203,22 +203,26 @@ class WeatherProvider extends ChangeNotifier {
       notifyListeners();
     }
 
-    // Try to fetch weather by location first
+    // Prioritize city-based weather for better reliability on emulators
+    // Try default city (Kampala) first
     try {
+      print('Attempting to fetch weather for default city (Kampala)...');
+      await fetchWeatherByCity('Kampala');
+      return; // Success! Exit early
+    } catch (cityError) {
+      print('Failed to fetch weather for default city: $cityError');
+    }
+
+    // If city fetch fails, try GPS location as fallback
+    try {
+      print('Falling back to GPS location...');
       await fetchWeatherByLocation();
     } catch (e) {
       print('Failed to get weather by location: $e');
-      
-      // Fallback: If location fails, try to get weather for Kampala (default city)
-      // This helps during development and for users who deny location
+      // Both methods failed, but we might have cached data
       if (_weather == null) {
-        print('Attempting to fetch weather for default city (Kampala)...');
-        try {
-          await fetchWeatherByCity('Kampala');
-        } catch (cityError) {
-          print('Fallback to default city also failed: $cityError');
-          // If both fail, error message will already be set
-        }
+        _errorMessage = 'Unable to fetch weather data. Please check your internet connection.';
+        _setState(WeatherState.error);
       }
     }
   }

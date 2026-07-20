@@ -85,23 +85,16 @@ packages:
     dependency: transitive
     description:
       name: cross_file
-<<<<<<< HEAD
-<<<<<<< HEAD
       sha256: "92c9c43c383bfa1c32079d3bc492d55d6d4318044b7b47edaff8971cbb555c51"
       url: "https://pub.dev"
     source: hosted
     version: "0.3.5+4"
-=======
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
       sha256: "28bb3ae56f117b5aec029d702a90f57d285cd975c3c5c281eaca38dbc47c5937"
       url: "https://pub.dev"
     source: hosted
     version: "0.3.5+2"
-<<<<<<< HEAD
->>>>>>> origin/main
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
   crypto:
     dependency: transitive
     description:
@@ -134,8 +127,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 file:
   dependency: transitive
   description:
@@ -189,9 +181,7 @@ fixnum:
     url: "https://pub.dev"
   source: hosted
   version: "1.1.1"  flutter:
-=======
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
   file:
     dependency: transitive
     description:
@@ -241,10 +231,7 @@ fixnum:
     source: hosted
     version: "1.1.1"
   flutter:
-<<<<<<< HEAD
->>>>>>> origin/main
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
     dependency: "direct main"
     description: flutter
     source: sdk
@@ -261,23 +248,17 @@ fixnum:
     dependency: transitive
     description:
       name: flutter_plugin_android_lifecycle
-<<<<<<< HEAD
-<<<<<<< HEAD
+
       sha256: "3854fe5e3bff0b113c658f260b90c95dea17c92db0f2addeac2e343dd9969785"
       url: "https://pub.dev"
     source: hosted
     version: "2.0.35"
-=======
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
       sha256: "38d1c268de9097ff59cf0e844ac38759fc78f76836d37edad06fa21e182055a0"
       url: "https://pub.dev"
     source: hosted
     version: "2.0.34"
-<<<<<<< HEAD
->>>>>>> origin/main
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -288,8 +269,7 @@ fixnum:
     description: flutter
     source: sdk
     version: "0.0.0"
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 geolocator:
   dependency: "direct main"
   description:
@@ -442,9 +422,7 @@ image_picker_windows:
     url: "https://pub.dev"
   source: hosted
   version: "0.2.2"  leak_tracker:
-=======
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
   geolocator:
     dependency: "direct main"
     description:
@@ -590,10 +568,7 @@ image_picker_windows:
     source: hosted
     version: "0.19.0"
   leak_tracker:
-<<<<<<< HEAD
->>>>>>> origin/main
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
     dependency: transitive
     description:
       name: leak_tracker
@@ -648,15 +623,11 @@ image_picker_windows:
       sha256: e3641ec5d63ebf0d9b41bd43201a66e3fc79a65db5f61fc181f04cd27aab950c
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     version: "1.18.0"
-=======
+
     version: "1.16.0"
->>>>>>> origin/main
-=======
-    version: "1.16.0"
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
   mime:
     dependency: transitive
     description:
@@ -665,13 +636,9 @@ image_picker_windows:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
+
   nested:
     dependency: transitive
     description:
@@ -740,44 +707,32 @@ image_picker_windows:
     dependency: "direct main"
     description:
       name: permission_handler
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
       sha256: fe54465bcc62a4564c6e4db337bbaded6c0c0fa6e10487414436d163114784f6
       url: "https://pub.dev"
     source: hosted
     version: "12.0.3"
-<<<<<<< HEAD
-=======
+
       sha256: "59adad729136f01ea9e35a48f5d1395e25cba6cea552249ddbe9cf950f5d7849"
       url: "https://pub.dev"
     source: hosted
     version: "11.4.0"
->>>>>>> origin/main
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
   permission_handler_android:
     dependency: transitive
     description:
       name: permission_handler_android
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
       sha256: "1e3bc410ca1bf84662104b100eb126e066cb55791b7451307f9708d4007350e6"
       url: "https://pub.dev"
     source: hosted
     version: "13.0.1"
-<<<<<<< HEAD
-=======
+
       sha256: d3971dcdd76182a0c198c096b5db2f0884b0d4196723d21a866fc4cdea057ebc
       url: "https://pub.dev"
     source: hosted
     version: "12.1.0"
->>>>>>> origin/main
-=======
->>>>>>> 682cd409e2606419921e3fb13e8f1d5c75fd444d
+
   permission_handler_apple:
     dependency: transitive
     description:

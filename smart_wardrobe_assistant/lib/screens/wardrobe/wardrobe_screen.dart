@@ -185,7 +185,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          'My Wardrobe',
+          widget.searchMode ? 'Search Wardrobe' : 'My Wardrobe',
           style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.w600,

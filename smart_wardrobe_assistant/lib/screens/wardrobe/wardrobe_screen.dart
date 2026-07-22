@@ -24,7 +24,12 @@ import '../../widgets/loading_widget.dart';
 /// WardrobeScreen
 /// Displays and manages the user's clothing wardrobe
 class WardrobeScreen extends StatefulWidget {
-  const WardrobeScreen({super.key});
+  final bool searchMode;
+
+  const WardrobeScreen({
+    super.key,
+    this.searchMode = false,
+  });
 
   @override
   State<WardrobeScreen> createState() => _WardrobeScreenState();

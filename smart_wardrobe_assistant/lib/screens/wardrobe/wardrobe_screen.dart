@@ -251,6 +251,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                     },
                     initialValue: wardrobeProvider.searchQuery,
                     hintText: 'Search clothes...',
+                    autofocus: widget.searchMode,
                   ),
                 ),
 
